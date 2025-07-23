@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore regiter_plugin_registrant.cc
+local_community_marketplace/linux/flutter/generated_plugin_registrant.cc
+local_community_marketplace/linux/flutter/generated_plugin_registrant.h
+local_community_marketplace/linux/flutter/generated_plugins.cmake
+local_community_marketplace/macos/flutter/GeneratedPluginRegistrant.swift
+local_community_marketplace/windows/flutter/generated_plugin_registrant.cc
+local_community_marketplace/windows/flutter/generated_plugin_registrant.h
+local_community_marketplace/windows/flutter/generated_plugins.cmake
