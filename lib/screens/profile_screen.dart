@@ -20,7 +20,10 @@ class ProfileScreen extends StatelessWidget {
                   const CircleAvatar(
                     radius: 35,
                     backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 40, color: Colors.white),
+                    child: ImageIcon(
+                      AssetImage('assets/icons/user.png'),
+                      size: 35,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -45,7 +48,10 @@ class ProfileScreen extends StatelessWidget {
                     onPressed: () {
                       // TODO: Add edit profile action
                     },
-                    icon: const Icon(Icons.edit, size: 16),
+                    icon: const ImageIcon(
+                      AssetImage('assets/icons/edit.png'),
+                      size: 16,
+                    ),
                     label: const Text('Edit Profile'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFD1E9F2),
@@ -61,21 +67,30 @@ class ProfileScreen extends StatelessWidget {
               child: ListView(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.history),
+                    leading: const ImageIcon(
+                      AssetImage('assets/icons/seller-store.png'),
+                      size: 20,
+                    ),
                     title: const Text("Purchase History"),
                     onTap: () {
                       // TODO: Navigate to Purchase History
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.store),
+                    leading: const ImageIcon(
+                      AssetImage('assets/icons/seller.png'),
+                      size: 20,
+                    ),
                     title: const Text("My Store"),
                     onTap: () {
                       // TODO: Navigate to My Store
                     },
                   ),
                   ListTile(
-                    leading: const Icon(Icons.favorite_border),
+                    leading: const ImageIcon(
+                      AssetImage('assets/icons/heart.png'),
+                      size: 20,
+                    ),
                     title: const Text("My favorites"),
                     onTap: () {
                       // TODO: Navigate to Favorites
@@ -95,7 +110,8 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                         child: Text('Log Out'),
                       ),
                     ),

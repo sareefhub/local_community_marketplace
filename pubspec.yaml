@@ -64,6 +64,11 @@ flutter:
     - assets/icons/more.png
     - assets/icons/bell.png
     - assets/icons/home.png
+    - assets/icons/edit.png
+    - assets/icons/heart.png
+    - assets/icons/seller.png
+    - assets/icons/seller-store.png
+    - assets/icons/circle-user.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
