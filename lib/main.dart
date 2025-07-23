@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Local Community Marketplace',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
       home: const SplashScreen(),
