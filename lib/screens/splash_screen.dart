@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:local_community_marketplace/main.dart';
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Flutter Demo Home Page'),
+          builder: (context) => const HomeScreen(),
         ),
       );
     });
@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           Image.asset(
             'assets/logo-splash.png',
-            width: 700,
+            width: 200,
           ),
           const SizedBox(height: 20),
           const SizedBox(height: 20),
