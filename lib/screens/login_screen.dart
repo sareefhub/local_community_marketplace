@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'login_phone_screen.dart';
+import 'login_email_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -52,13 +54,33 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {},
-                  child: const Text("Log in With Phone Number"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginEmailScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade100,
                     foregroundColor: Colors.black,
                     minimumSize: const Size(double.infinity, 48),
                   ),
+                  child: const Text("Log in With Email"),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPhoneScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade100,
+                    foregroundColor: Colors.black,
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: const Text("Log in With Phone Number"),
                 ),
                 const SizedBox(height: 32),
                 Row(
