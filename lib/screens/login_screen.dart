@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'login_phone_screen.dart';
-import 'login_email_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -23,8 +21,15 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 48),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const FaIcon(FontAwesomeIcons.google, color: Colors.black),
-                  label: const Text("Continue with Google", style: TextStyle(color: Colors.black)),
+                  icon: Image.asset(
+                    'assets/icons/search.png',
+                    height: 24,
+                    width: 24,
+                  ),
+                  label: const Text(
+                    "Continue with Google",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade100,
                     minimumSize: const Size(double.infinity, 48),
@@ -33,11 +38,17 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const FaIcon(FontAwesomeIcons.facebook, color: Colors.white),
-                  label: const Text("Continue with Facebook"),
+                  icon: Image.asset(
+                    'assets/icons/facebook.png',
+                    height: 24,
+                    width: 24,
+                  ),
+                  label: const Text(
+                    "Continue with Facebook",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade800,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue.shade100,
                     minimumSize: const Size(double.infinity, 48),
                   ),
                 ),
@@ -53,21 +64,6 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginEmailScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade100,
-                    foregroundColor: Colors.black,
-                    minimumSize: const Size(double.infinity, 48),
-                  ),
-                  child: const Text("Log in With Email"),
-                ),
-                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
