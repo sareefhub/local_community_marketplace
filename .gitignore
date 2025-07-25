@@ -54,6 +54,7 @@ local_community_marketplace/windows/flutter/generated_plugin_registrant.h
 local_community_marketplace/windows/flutter/generated_plugins.cmake
 
 # Flutter generated plugin files (ignore across all platforms)
+windows/flutter/generated_plugins.cmake
 **/flutter/generated_plugin_registrant.*
 **/flutter/generated_plugins.cmake
 **/flutter/GeneratedPluginRegistrant.swift
