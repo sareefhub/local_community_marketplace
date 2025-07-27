@@ -65,22 +65,9 @@ flutter:
   assets:
     - assets/logo-splash.png
     - assets/logo.png
-    - assets/icons/search.png
-    - assets/icons/facebook.png
-    - assets/category-image/fresh_food.jpg
-    - assets/category-image/household.jpg
-    - assets/category-image/clothing.jpg
-    - assets/category-image/handicrafts.jpg
-    - assets/category-image/beauty.jpg
-    - assets/category-image/ready_to_eat.jpg
-    - assets/category-image/home_garden.jpg
-    - assets/category-image/mom_baby.jpg
-    - assets/category-image/electronics.jpg
-    - assets/category-image/tools.jpg
-    - assets/products-image/mango.jpg
-    - assets/products-image/basket.jpg
-    - assets/products-image/milk.jpg
-    - assets/products-image/drill.jpg
+    - assets/icons/
+    - assets/category-image/
+    - assets/products-image/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

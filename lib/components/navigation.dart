@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_community_marketplace/screens/profile_screen.dart';
+import 'package:local_community_marketplace/screens/home_screen.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -10,7 +11,8 @@ class BottomNavBar extends StatelessWidget {
 
     switch (index) {
       case 0:
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
         break;
       case 1:
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const NotificationScreen()));
