@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_community_marketplace/screens/profile_screen.dart';
-import 'package:local_community_marketplace/screens/home_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -11,21 +10,19 @@ class BottomNavBar extends StatelessWidget {
 
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        context.go('/home');
         break;
       case 1:
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const NotificationScreen()));
+        //context.go('/notification');
         break;
       case 2:
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const PostScreen()));
+        //context.go('/post');
         break;
       case 3:
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
+        //context.go('/chat');
         break;
       case 4:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
+        context.go('/profile');
         break;
     }
   }

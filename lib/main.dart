@@ -9,6 +9,8 @@ import 'screens/profile_screen.dart';
 // import 'screens/login_phone_screen.dart';
 // import 'screens/register_phone_screen.dart';
 
+import 'package:go_router/go_router.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -22,7 +24,43 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final GoRouter _router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: '/home',
+          builder: (context, state) => const HomeScreen(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+        // GoRoute(
+        //   path: '/notification',
+        //   builder: (context, state) => const NotificationScreen()
+        // ),
+        // GoRoute(path: '/post',
+        //   builder: (context, state) => const PostScreen()
+        // ),
+        // GoRoute(path: '/chat',
+        //   builder: (context, state) => const ChatScreen()
+        // ),
+        // GoRoute(
+        //   path: '/loginphone',
+        //   builder: (context, state) => LoginPhoneScreen(),
+        // ),
+      ],
+    );
+
+    return MaterialApp.router(
       title: 'Local Community Marketplace',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -30,15 +68,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      initialRoute: '/', // จุดเริ่มต้น
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/profile': (context) => const ProfileScreen(),
-        // '/loginphone': (context) => LoginPhoneScreen(),
-        // '/registerphone': (context) => RegisterPhoneScreen(),
-      },
+      routerConfig: _router,
     );
   }
 }
