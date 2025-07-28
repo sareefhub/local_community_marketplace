@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:local_community_marketplace/screens/product_info_screen.dart';
+import 'package:local_community_marketplace/components/navigation.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -7,47 +9,48 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> categoryList = [
-      {'label': 'Fresh Food', 'image': 'assets/category-image/fresh_food.jpg'},
-      {'label': 'Household', 'image': 'assets/category-image/household.jpg'},
-      {'label': 'Clothing', 'image': 'assets/category-image/clothing.jpg'},
-      {'label': 'Handicrafts', 'image': 'assets/category-image/handicrafts.jpg'},
-      {'label': 'Beauty & Health', 'image': 'assets/category-image/beauty.jpg'},
-      {'label': 'Ready to Eat Food', 'image': 'assets/category-image/ready_to_eat.jpg'},
-      {'label': 'Home & Garden', 'image': 'assets/category-image/home_garden.jpg'},
-      {'label': 'Mom & Baby', 'image': 'assets/category-image/mom_baby.jpg'},
-      {'label': 'Electronics', 'image': 'assets/category-image/electronics.jpg'},
-      {'label': 'Tools', 'image': 'assets/category-image/tools.jpg'},
+      {'label': 'อาหารสด', 'image': 'assets/category-image/fresh_food.jpg'},
+      {'label': 'ของใช้ในบ้าน', 'image': 'assets/category-image/household.jpg'},
+      {'label': 'เสื้อผ้า', 'image': 'assets/category-image/clothing.jpg'},
+      {'label': 'งานหัตถกรรม', 'image': 'assets/category-image/handicrafts.jpg'},
+      {'label': 'ความงามและสุขภาพ', 'image': 'assets/category-image/beauty.jpg'},
+      {'label': 'อาหารพร้อมทาน', 'image': 'assets/category-image/ready_to_eat.jpg'},
+      {'label': 'บ้านและสวน', 'image': 'assets/category-image/home_garden.jpg'},
+      {'label': 'แม่และเด็ก', 'image': 'assets/category-image/mom_baby.jpg'},
+      {'label': 'เครื่องใช้ไฟฟ้า', 'image': 'assets/category-image/electronics.jpg'},
+      {'label': 'เครื่องมือช่าง', 'image': 'assets/category-image/tools.jpg'},
     ];
+
 
     final List<Map<String, dynamic>> bestSaleProducts = [
       {
-        'category': 'Fresh Food',
-        'name': 'Organic Mango',
-        'location': 'Chiang Mai',
+        'category': 'อาหารสด',
+        'name': 'มะม่วงออร์แกนิก',
+        'location': 'เชียงใหม่',
         'price': '฿120',
         'rating': 4,
         'image': 'assets/products-image/mango.jpg',
       },
       {
-        'category': 'Handicrafts',
-        'name': 'Bamboo Basket',
-        'location': 'Lampang',
+        'category': 'หัตถกรรม',
+        'name': 'ตะกร้าสานไม้ไผ่',
+        'location': 'ลำปาง',
         'price': '฿250',
         'rating': 5,
         'image': 'assets/products-image/basket.jpg',
       },
       {
-        'category': 'Mom & Baby',
-        'name': 'Baby milk bottle',
-        'location': 'Songkhla',
+        'category': 'แม่และเด็ก',
+        'name': 'ขวดนมเด็ก',
+        'location': 'สงขลา',
         'price': '฿320',
         'rating': 3.5,
         'image': 'assets/products-image/milk.jpg',
       },
       {
-        'category': 'Tools',
-        'name': 'Drill',
-        'location': 'Bangkok',
+        'category': 'เครื่องมือช่าง',
+        'name': 'สว่าน',
+        'location': 'กรุงเทพมหานคร',
         'price': '฿1,450',
         'rating': 4,
         'image': 'assets/products-image/drill.jpg',
@@ -81,7 +84,7 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search',
+                  hintText: 'ค้นหา',
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
                   fillColor: Colors.white,
@@ -107,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Category',
+                          'หมวดหมู่',
                           style: GoogleFonts.sarabun(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -178,92 +181,87 @@ class HomeScreen extends StatelessWidget {
                    // Best Sale Section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Recommend for you',
-                        style: GoogleFonts.sarabun(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Grid of Products
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(), 
+                      physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
-                      childAspectRatio: 0.65, 
+                      childAspectRatio: 0.65,
                       children: List.generate(bestSaleProducts.length, (index) {
                         final product = bestSaleProducts[index];
-                        return Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.asset(
-                                      product['image'],
-                                      height: 130,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductInfoPage(product: product),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.asset(
+                                        product['image'],
+                                        height: 130,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  const Positioned(
-                                    top: 4,
-                                    right: 4,
-                                    child: Icon(Icons.favorite_border),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                product['category'],
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                              Text(
-                                product['name'],
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                product['location'],
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: List.generate(5, (i) {
-                                  return Icon(
-                                    i < product['rating']
-                                        ? Icons.star
-                                        : Icons.star_border,
-                                    size: 14,
-                                    color: Colors.orange,
-                                  );
-                                }),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                product['price'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                                    const Positioned(
+                                      top: 4,
+                                      right: 4,
+                                      child: Icon(Icons.favorite_border),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text(
+                                  product['category'],
+                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                ),
+                                Text(
+                                  product['name'],
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  product['location'],
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: List.generate(5, (i) {
+                                    return Icon(
+                                      i < product['rating']
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      size: 14,
+                                      color: Colors.orange,
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  product['price'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }),
@@ -309,17 +307,17 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 8),
                                   const Text(
-                                    'Category',
+                                    'หมวดหมู่',
                                     style: TextStyle(
                                         fontSize: 12, color: Colors.grey),
                                   ),
                                   const Text(
-                                    'Product\'s name',
+                                    'ชื่อสินค้า',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold),
                                   ),
                                   const Text(
-                                    'Location',
+                                    'สถานที่',
                                     style: TextStyle(fontSize: 12),
                                   ),
                                   const SizedBox(height: 4),
@@ -333,7 +331,7 @@ class HomeScreen extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text('Price',
+                                  const Text('ราคา',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.green)),
@@ -355,20 +353,7 @@ class HomeScreen extends StatelessWidget {
       ),
 
       // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Post'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }
