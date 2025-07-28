@@ -6,6 +6,7 @@ import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/post_screen.dart';
 // import 'screens/login_phone_screen.dart';
 // import 'screens/register_phone_screen.dart';
 
@@ -43,12 +44,14 @@ class MyApp extends StatelessWidget {
           path: '/profile',
           builder: (context, state) => const ProfileScreen(),
         ),
+        GoRoute(
+          path: '/post',
+          builder: (context, state) => const PostScreen(),
+        ),
+
         // GoRoute(
         //   path: '/notification',
         //   builder: (context, state) => const NotificationScreen()
-        // ),
-        // GoRoute(path: '/post',
-        //   builder: (context, state) => const PostScreen()
         // ),
         // GoRoute(path: '/chat',
         //   builder: (context, state) => const ChatScreen()

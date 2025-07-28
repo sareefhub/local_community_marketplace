@@ -16,7 +16,7 @@ class BottomNavBar extends StatelessWidget {
         //context.go('/notification');
         break;
       case 2:
-        //context.go('/post');
+        context.go('/post');
         break;
       case 3:
         //context.go('/chat');
