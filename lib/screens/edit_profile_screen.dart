@@ -40,7 +40,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (doc.exists) {
         final data = doc.data()!;
         _usernameController.text = data['username'] ?? '';
-        _phoneController.text = data['phone'] ?? '';
+        // ถ้าไม่มี editPhone ให้ fallback ใช้ registerPhone
+        _phoneController.text = data['editPhone'] ?? data['phone'] ?? '';
         _profileImageUrl = data['profileImageUrl'];
       }
     } catch (e) {
@@ -54,8 +55,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  bool _validateInput() {
+    String username = _usernameController.text.trim();
+    String phone = _phoneController.text.trim();
+
+    if (username.isEmpty || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All fields are required')),
+      );
+      return false;
+    }
+
+    if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone must be exactly 10 digits')),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   Future<void> _saveProfile() async {
     if (userId == null) return;
+    if (!_validateInput()) return;
 
     setState(() {
       _isSaving = true;
@@ -64,8 +87,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       await _firestore.collection('users').doc(userId).update({
         'username': _usernameController.text.trim(),
-        'phone': _phoneController.text.trim(),
+        'editPhone': _phoneController.text.trim(), // แยกจากเบอร์ register
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
       );
