@@ -5,6 +5,7 @@ GeneratedPluginRegistrant.java
 /local.properties
 /gradlew
 /gradlew.bat
+/gradle
 
 # Build files
 **/build/
