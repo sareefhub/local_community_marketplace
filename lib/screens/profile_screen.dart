@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
+import 'package:local_community_marketplace/utils/user_session.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final String? username = UserSession.username;
+    final String? userId = UserSession.userId;
+    final String? phone = UserSession.phone;
+
+    final bool isLoggedIn = username != null && userId != null && phone != null;
+
     return Scaffold(
       bottomNavigationBar: const BottomNavBar(currentIndex: 4),
       backgroundColor: const Color(0xFFE0F3F7),
@@ -28,26 +36,24 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         'User',
                         style: TextStyle(fontSize: 14, color: Colors.black),
                       ),
                       Text(
-                        'Natcha Laepankaew',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        username ?? 'Guest',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'User ID\n12345678',
-                        style: TextStyle(fontSize: 12),
+                        userId != null ? 'User ID\n$userId' : 'Not logged in',
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
                   const Spacer(),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Add edit profile action
-                    },
+                    onPressed: () {},
                     icon: const ImageIcon(
                       AssetImage('assets/icons/edit.png'),
                       size: 16,
@@ -72,9 +78,7 @@ class ProfileScreen extends StatelessWidget {
                       size: 20,
                     ),
                     title: const Text("Purchase History"),
-                    onTap: () {
-                      // TODO: Navigate to Purchase History
-                    },
+                    onTap: () {},
                   ),
                   ListTile(
                     leading: const ImageIcon(
@@ -82,9 +86,7 @@ class ProfileScreen extends StatelessWidget {
                       size: 20,
                     ),
                     title: const Text("My Store"),
-                    onTap: () {
-                      // TODO: Navigate to My Store
-                    },
+                    onTap: () {},
                   ),
                   ListTile(
                     leading: const ImageIcon(
@@ -92,15 +94,18 @@ class ProfileScreen extends StatelessWidget {
                       size: 20,
                     ),
                     title: const Text("My favorites"),
-                    onTap: () {
-                      // TODO: Navigate to Favorites
-                    },
+                    onTap: () {},
                   ),
                   const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Add log out logic
+                        if (isLoggedIn) {
+                          UserSession.clear();
+                          context.go('/login');
+                        } else {
+                          context.go('/login');
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD1E9F2),
@@ -109,10 +114,9 @@ class ProfileScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                        child: Text('Log Out'),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        child: Text(isLoggedIn ? 'Log Out' : 'Log In'),
                       ),
                     ),
                   ),

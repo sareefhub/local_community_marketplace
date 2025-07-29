@@ -16,28 +16,47 @@ class RegisterPhoneScreen extends StatelessWidget {
       return;
     }
 
+    final firestore = FirebaseFirestore.instance;
+
     try {
-      final snapshot = await FirebaseFirestore.instance
+      final snapshot = await firestore
           .collection('users')
           .where('phone', isEqualTo: phone)
           .get();
 
-      if (snapshot.docs.isEmpty) {
-        await FirebaseFirestore.instance.collection('users').add({
-          'phone': phone,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ ลงทะเบียนสำเร็จ')),
-        );
-
-        Navigator.pop(context); // กลับไปหน้า login
-      } else {
+      if (snapshot.docs.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('❗ เบอร์นี้ถูกใช้แล้ว')),
         );
+        return;
       }
+
+      await firestore.runTransaction((transaction) async {
+        final counterRef = firestore.collection('counters').doc('users');
+        final counterSnap = await transaction.get(counterRef);
+
+        int lastUserId = 0;
+        if (counterSnap.exists) {
+          lastUserId = counterSnap.get('lastUserId') ?? 0;
+        }
+
+        final newUserId = lastUserId + 1;
+        final newUsername = 'user$newUserId';
+
+        final newUserRef = firestore.collection('users').doc(newUsername);
+        transaction.set(newUserRef, {
+          'phone': phone,
+          'userId': newUserId.toString(),
+          'username': newUsername,
+        });
+
+        transaction.set(counterRef, {'lastUserId': newUserId});
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ ลงทะเบียนสำเร็จ')),
+      );
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('⚠ เกิดข้อผิดพลาด: ${e.toString()}')),

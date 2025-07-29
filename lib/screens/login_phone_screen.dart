@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
+import 'package:local_community_marketplace/utils/user_session.dart';
 
 class LoginPhoneScreen extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
@@ -12,12 +14,19 @@ class LoginPhoneScreen extends StatelessWidget {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('phone', isEqualTo: phone)
+          .limit(1)
           .get();
 
       if (snapshot.docs.isNotEmpty) {
+        final userData = snapshot.docs.first.data();
+        UserSession.phone = phone;
+        UserSession.username = userData['username'];
+        UserSession.userId = snapshot.docs.first.id;
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Login success')),
         );
+        context.go('/home');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('❌ Invalid phone number')),
