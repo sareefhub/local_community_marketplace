@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:local_community_marketplace/dummy_products.dart';
 
 class ProductInfoPage extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -8,52 +9,7 @@ class ProductInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> bestSaleProducts = [
-    {
-      'category': 'อาหารสด',
-      'name': 'มะม่วงออร์แกนิก',
-      'location': 'เชียงใหม่',
-      'price': '฿120',
-      'rating': 4,
-      'image': 'assets/products-image/mango.jpg',
-      'description': 'มะม่วงออร์แกนิก สดจากสวน ปลอดสารพิษ เหมาะสำหรับสุขภาพดีทุกวัย',
-      'sellerName': 'สมชาย ฟาร์มสด',
-      'sellerImage': 'assets/sellers-image/somchai.jpg',
-    },
-    {
-      'category': 'หัตถกรรม',
-      'name': 'ตะกร้าสานไม้ไผ่',
-      'location': 'ลำปาง',
-      'price': '฿250',
-      'rating': 5,
-      'image': 'assets/products-image/basket.jpg',
-      'description': 'ตะกร้าสานจากไม้ไผ่ธรรมชาติ เหมาะกับการใช้งานหรือเป็นของตกแต่ง',
-      'sellerName': 'แม่หญิงล้านนา',
-      'sellerImage': 'assets/sellers-image/maeying.jpg',
-    },
-    {
-      'category': 'แม่และเด็ก',
-      'name': 'ขวดนมเด็ก',
-      'location': 'สงขลา',
-      'price': '฿320',
-      'rating': 3.5,
-      'image': 'assets/products-image/milk.jpg',
-      'description': 'ขวดนมสำหรับทารก ผลิตจากวัสดุปลอดสาร BPA ทนความร้อนสูง',
-      'sellerName': 'เบบี้ช็อป',
-      'sellerImage': 'assets/sellers-image/babyshop.jpg',
-    },
-    {
-      'category': 'เครื่องมือช่าง',
-      'name': 'สว่าน',
-      'location': 'กรุงเทพมหานคร',
-      'price': '฿1,450',
-      'rating': 4,
-      'image': 'assets/products-image/drill.jpg',
-      'description': 'สว่านไฟฟ้าคุณภาพสูง สำหรับงานช่าง ใช้งานง่าย พกพาสะดวก',
-      'sellerName': 'ร้านช่างมือโปร',
-      'sellerImage': 'assets/sellers-image/toolpro.jpg',
-    },
-  ];
+    final List<Map<String, dynamic>> bestSaleProducts = dummyProducts.take(4).toList(); 
   
   // Find product info (description) by checking the product that was sent first.
     String productDescription = '';

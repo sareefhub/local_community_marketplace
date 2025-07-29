@@ -2,61 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/screens/product_info_screen.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
+import 'package:local_community_marketplace/dummy_products.dart';
+import 'package:local_community_marketplace/dummy_categories.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> categoryList = [
-      {'label': 'อาหารสด', 'image': 'assets/category-image/fresh_food.jpg'},
-      {'label': 'ของใช้ในบ้าน', 'image': 'assets/category-image/household.jpg'},
-      {'label': 'เสื้อผ้า', 'image': 'assets/category-image/clothing.jpg'},
-      {'label': 'งานหัตถกรรม', 'image': 'assets/category-image/handicrafts.jpg'},
-      {'label': 'ความงามและสุขภาพ', 'image': 'assets/category-image/beauty.jpg'},
-      {'label': 'อาหารพร้อมทาน', 'image': 'assets/category-image/ready_to_eat.jpg'},
-      {'label': 'บ้านและสวน', 'image': 'assets/category-image/home_garden.jpg'},
-      {'label': 'แม่และเด็ก', 'image': 'assets/category-image/mom_baby.jpg'},
-      {'label': 'เครื่องใช้ไฟฟ้า', 'image': 'assets/category-image/electronics.jpg'},
-      {'label': 'เครื่องมือช่าง', 'image': 'assets/category-image/tools.jpg'},
-    ];
+    final categoryList = dummyCategories;
 
-
-    final List<Map<String, dynamic>> bestSaleProducts = [
-      {
-        'category': 'อาหารสด',
-        'name': 'มะม่วงออร์แกนิก',
-        'location': 'เชียงใหม่',
-        'price': '฿120',
-        'rating': 4,
-        'image': 'assets/products-image/mango.jpg',
-      },
-      {
-        'category': 'หัตถกรรม',
-        'name': 'ตะกร้าสานไม้ไผ่',
-        'location': 'ลำปาง',
-        'price': '฿250',
-        'rating': 5,
-        'image': 'assets/products-image/basket.jpg',
-      },
-      {
-        'category': 'แม่และเด็ก',
-        'name': 'ขวดนมเด็ก',
-        'location': 'สงขลา',
-        'price': '฿320',
-        'rating': 3.5,
-        'image': 'assets/products-image/milk.jpg',
-      },
-      {
-        'category': 'เครื่องมือช่าง',
-        'name': 'สว่าน',
-        'location': 'กรุงเทพมหานคร',
-        'price': '฿1,450',
-        'rating': 4,
-        'image': 'assets/products-image/drill.jpg',
-      },
-    ];
-
+    final List<Map<String, dynamic>> bestSaleProducts = dummyProducts.take(4).toList(); 
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
