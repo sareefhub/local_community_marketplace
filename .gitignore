@@ -57,3 +57,7 @@ local_community_marketplace/windows/flutter/generated_plugins.cmake
 **/flutter/generated_plugin_registrant.*
 **/flutter/generated_plugins.cmake
 **/flutter/GeneratedPluginRegistrant.*
+
+# Config Firebase
+/firebase.json
+/lib/firebase_options.dart
