@@ -53,7 +53,9 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push('/edit_profile');
+                    },
                     icon: const ImageIcon(
                       AssetImage('assets/icons/edit.png'),
                       size: 16,
@@ -115,7 +117,8 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 12),
                         child: Text(isLoggedIn ? 'Log Out' : 'Log In'),
                       ),
                     ),

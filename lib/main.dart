@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/post_screen.dart';
+import 'screens/edit_profile_screen.dart';
 // import 'screens/login_phone_screen.dart';
 // import 'screens/register_phone_screen.dart';
 
@@ -47,6 +48,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/post',
           builder: (context, state) => const PostScreen(),
+        ),
+        GoRoute(
+          path: '/edit_profile',
+          builder: (context, state) => const EditProfileScreen(),
         ),
 
         // GoRoute(
