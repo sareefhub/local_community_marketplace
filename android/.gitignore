@@ -8,11 +8,13 @@ GeneratedPluginRegistrant.java
 
 # Build files
 **/build/
-android/app/build.gradle.kts
-android/settings.gradle.kts
+/app/build.gradle.kts
+/settings.gradle.kts
+/build.gradle.kts
+/gradle.properties
 
 # Google Services config (SHOULD NOT be committed)
-android/app/google-services.json
+/app/google-services.json
 
 # Keystore files (DO NOT COMMIT)
 key.properties
