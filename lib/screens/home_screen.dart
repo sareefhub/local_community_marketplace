@@ -1,18 +1,25 @@
+// lib/screens/home
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:local_community_marketplace/screens/product_info_screen.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/dummy_products.dart';
 import 'package:local_community_marketplace/dummy_categories.dart';
+import 'package:local_community_marketplace/screens/category_productlist_screen.dart';
+import 'package:local_community_marketplace/components/product_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
     final categoryList = dummyCategories;
-
-    final List<Map<String, dynamic>> bestSaleProducts = dummyProducts.take(4).toList(); 
+    final List<Map<String, dynamic>> bestSaleProducts =
+        dummyProducts.take(4).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
@@ -84,46 +91,62 @@ class HomeScreen extends StatelessWidget {
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: List.generate(categoryList.length, (index) {
+                            children:
+                                List.generate(categoryList.length, (index) {
                               final category = categoryList[index];
                               return Padding(
                                 padding: const EdgeInsets.only(right: 12),
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      width: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 4,
-                                            offset: Offset(2, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.asset(
-                                          category['image']!,
-                                          fit: BoxFit.cover,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            CategoryProductListScreen(
+                                          categoryName: category['label'],
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    SizedBox(
-                                      width: 60,
-                                      child: Text(
-                                        category['label']!,
-                                        style: const TextStyle(fontSize: 12),
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 4,
+                                              offset: Offset(2, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.asset(
+                                            category['image']!,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 6),
+                                      SizedBox(
+                                        width: 60,
+                                        child: Text(
+                                          category['label']!,
+                                          style: const TextStyle(fontSize: 12),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             }),
@@ -134,106 +157,34 @@ class HomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                   // Best Sale Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: 0.65,
-                      children: List.generate(bestSaleProducts.length, (index) {
-                        final product = bestSaleProducts[index];
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProductInfoPage(product: product),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.asset(
-                                        product['image'],
-                                        height: 130,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    const Positioned(
-                                      top: 4,
-                                      right: 4,
-                                      child: Icon(Icons.favorite_border),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  product['category'],
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                ),
-                                Text(
-                                  product['name'],
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  product['location'],
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: List.generate(5, (i) {
-                                    return Icon(
-                                      i < product['rating']
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      size: 14,
-                                      color: Colors.orange,
-                                    );
-                                  }),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  product['price'],
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
+                    // Product recommnend Section
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.63,
+                        children:
+                            List.generate(bestSaleProducts.length, (index) {
+                          final product = bestSaleProducts[index];
+                          return ProductCard(product: product);
+                        }),
+                      ),
                     ),
-                  ),
-
                     const SizedBox(height: 8),
 
-                    // Product Cards
+                    // Product Cards Example
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: List.generate(2, (index) {
                           return Expanded(
                             child: Container(
-                              margin: EdgeInsets.only(right: index == 0 ? 8 : 0),
+                              margin:
+                                  EdgeInsets.only(right: index == 0 ? 8 : 0),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -269,8 +220,8 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                   const Text(
                                     'ชื่อสินค้า',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   const Text(
                                     'สถานที่',
@@ -287,10 +238,13 @@ class HomeScreen extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text('ราคา',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green)),
+                                  const Text(
+                                    'ราคา',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -299,7 +253,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 80), // for spacing above nav bar
+                    const SizedBox(height: 80),
                   ],
                 ),
               ),
@@ -307,8 +261,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      // Bottom Navigation
       bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
