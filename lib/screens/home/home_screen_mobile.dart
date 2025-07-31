@@ -1,4 +1,4 @@
-// lib/screens/home_screen.dart
+// lib/screens/home_screen_mobile.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -6,14 +6,14 @@ import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/components/category_list.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreenMobile extends StatefulWidget {
+  const HomeScreenMobile({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreenMobile> createState() => _HomeScreenMobileState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenMobileState extends State<HomeScreenMobile> {
   Future<List<Map<String, dynamic>>> fetchProducts() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('products').get();
