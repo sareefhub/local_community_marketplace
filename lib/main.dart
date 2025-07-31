@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ เพิ่ม
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/login_phone_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/post_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/post_form_screen.dart';
 import 'screens/favorite_screen.dart';
+
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -20,7 +22,7 @@ void main() async {
   );
 
   runApp(
-    const ProviderScope(child: MyApp()), // ✅ ห่อด้วย ProviderScope
+    const ProviderScope(child: MyApp()),
   );
 }
 
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter _router = GoRouter(
-      initialLocation: '/',
+      initialLocation: '/login',
       routes: [
         GoRoute(
           path: '/',
@@ -43,6 +45,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/loginphone',
+          builder: (context, state) => LoginPhoneScreen(),
         ),
         GoRoute(
           path: '/profile',

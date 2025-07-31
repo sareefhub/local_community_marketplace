@@ -39,6 +39,17 @@ class LoginPhoneScreen extends StatelessWidget {
     }
   }
 
+  ButtonStyle buttonStyle({Color? bg, Color? fg, BorderSide? border}) => ElevatedButton.styleFrom(
+    backgroundColor: bg ?? Colors.white,
+    foregroundColor: fg ?? Colors.black,
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: border ?? BorderSide(color: Colors.grey.shade300, width: 1.5),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,25 +82,25 @@ class LoginPhoneScreen extends StatelessWidget {
                     hintText: 'Phone number',
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding:
+                    EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => loginWithPhone(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFD0E7F9),
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: ElevatedButton(
+                onPressed: () => loginWithPhone(context),
+                style: buttonStyle(
+                  bg: const Color(0xFFD0E7F9),
+                  fg: Colors.black,
                 ),
-              ),
-              child: const Text(
-                'Log In',
-                style: TextStyle(fontSize: 16),
+                child: const Text(
+                  'Log In',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                ),
               ),
             ),
             const Spacer(),
