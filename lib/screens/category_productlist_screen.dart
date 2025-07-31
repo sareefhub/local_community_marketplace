@@ -1,7 +1,8 @@
-// lib/screens/category_productlist
+// lib/screens/category_productlist_screen.dart
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:local_community_marketplace/dummy_products.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 
 class CategoryProductListScreen extends StatelessWidget {
@@ -9,13 +10,33 @@ class CategoryProductListScreen extends StatelessWidget {
 
   const CategoryProductListScreen({super.key, required this.categoryName});
 
+  Future<List<Map<String, dynamic>>> fetchProductsByCategory() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('products')
+        .where('category', isEqualTo: categoryName)
+        .get();
+
+    return snapshot.docs.map((doc) {
+      final data = Map<String, dynamic>.from(doc.data());
+
+      // กำหนดค่า default เผื่อบางฟิลด์ขาด
+      return {
+        'name': data['name'] ?? 'ไม่มีชื่อ',
+        'category': data['category'] ?? '',
+        'location': data['location'] ?? '',
+        'price': data['price'] ?? '',
+        'rating': (data['rating'] is num) ? data['rating'] : 0,
+        'image': data['image'] ?? 'assets/images/placeholder.png',
+        'description': data['description'] ?? '',
+        'sellerName': data['sellerName'] ?? '',
+        'sellerImage':
+            data['sellerImage'] ?? 'assets/images/placeholder_seller.png',
+      };
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Filter only products that match the category.
-    final List<Map<String, dynamic>> productList = dummyProducts
-        .where((product) => product['category'] == categoryName)
-        .toList();
-
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
       body: SafeArea(
@@ -41,7 +62,7 @@ class CategoryProductListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // ให้ชื่ออยู่กลางโดยประมาณ
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
@@ -92,28 +113,44 @@ class CategoryProductListScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Product Grid
+            // Product Grid (from Firebase)
             Expanded(
-              child: productList.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'ไม่มีสินค้าสำหรับหมวดนี้',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        childAspectRatio: 0.60,
-                        children: List.generate(productList.length, (index) {
-                          final product = productList[index];
-                          return ProductCard(product: product);
-                        }),
-                      ),
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: fetchProductsByCategory(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
+                    );
+                  }
+
+                  final productList = snapshot.data ?? [];
+
+                  if (productList.isEmpty) {
+                    return const Center(
+                      child: Text('ไม่มีสินค้าสำหรับหมวดนี้'),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: 0.60,
+                      children: List.generate(productList.length, (index) {
+                        final product = productList[index];
+                        return ProductCard(product: product);
+                      }),
                     ),
+                  );
+                },
+              ),
             ),
           ],
         ),

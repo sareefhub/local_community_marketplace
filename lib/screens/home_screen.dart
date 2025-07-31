@@ -1,10 +1,10 @@
-// lib/screens/home.dart
+// lib/screens/home_screen.dart
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/components/category_list.dart';
-import 'package:local_community_marketplace/dummy_products.dart';
-import 'package:local_community_marketplace/dummy_categories.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,12 +14,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<List<Map<String, dynamic>>> fetchProducts() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('products').get();
+
+    return snapshot.docs.map((doc) {
+      final data = Map<String, dynamic>.from(doc.data());
+
+      // กำหนดค่า default หากข้อมูลขาดหรือ null
+      data['category'] = data['category'] ?? 'ไม่มีหมวดหมู่';
+      data['name'] = data['name'] ?? 'ไม่มีชื่อสินค้า';
+      data['location'] = data['location'] ?? 'ไม่มีสถานที่';
+      data['price'] = data['price'] ?? 'ราคาไม่ระบุ';
+      data['rating'] = (data['rating'] is num) ? data['rating'] : 0;
+      data['image'] = data['image'] ?? 'assets/images/placeholder.png';
+      data['description'] = data['description'] ?? '';
+      data['sellerName'] = data['sellerName'] ?? '';
+      data['sellerImage'] =
+          data['sellerImage'] ?? 'assets/images/placeholder_seller.png';
+
+      return data;
+    }).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('categories').get();
+    return snapshot.docs
+        .map((doc) => Map<String, dynamic>.from(doc.data()))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final categoryList = dummyCategories;
-    final List<Map<String, dynamic>> bestSaleProducts =
-        dummyProducts.take(4).toList();
-
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
       body: SafeArea(
@@ -29,14 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Image.asset('assets/logo.png', height: 20),
-                      const SizedBox(width: 6),
-                    ],
-                  ),
+                  Image.asset('assets/logo.png', height: 20),
+                  const SizedBox(width: 6),
                 ],
               ),
             ),
@@ -61,115 +83,57 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // Categories Component
+            // Load data from Firestore
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    CategoryList(categories: categoryList),
+              child: FutureBuilder(
+                future: Future.wait([
+                  fetchCategories(),
+                  fetchProducts(),
+                ]),
+                builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    const SizedBox(height: 16),
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'));
+                  }
 
-                    // Product recommend Section
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        childAspectRatio: 0.63,
-                        children:
-                            List.generate(bestSaleProducts.length, (index) {
-                          final product = bestSaleProducts[index];
-                          return ProductCard(product: product);
-                        }),
-                      ),
+                  final categoryList =
+                      snapshot.data![0] as List<Map<String, dynamic>>;
+                  final productList =
+                      snapshot.data![1] as List<Map<String, dynamic>>;
+                  final bestSaleProducts = productList.take(4).toList();
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        CategoryList(categories: categoryList),
+                        const SizedBox(height: 16),
+
+                        // Product Grid
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: GridView.count(
+                            crossAxisCount: 2,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 0.63,
+                            children:
+                                List.generate(bestSaleProducts.length, (index) {
+                              return ProductCard(
+                                  product: bestSaleProducts[index]);
+                            }),
+                          ),
+                        ),
+                        const SizedBox(height: 80),
+                      ],
                     ),
-
-                    const SizedBox(height: 8),
-
-                    // Product Cards Example
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: List.generate(2, (index) {
-                          return Expanded(
-                            child: Container(
-                              margin:
-                                  EdgeInsets.only(right: index == 0 ? 8 : 0),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        height: 80,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: const Icon(Icons.image),
-                                      ),
-                                      const Positioned(
-                                        top: 4,
-                                        right: 4,
-                                        child: Icon(Icons.favorite_border),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'หมวดหมู่',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                  ),
-                                  const Text(
-                                    'ชื่อสินค้า',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const Text(
-                                    'สถานที่',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Row(
-                                    children: [
-                                      Icon(Icons.star, size: 14),
-                                      Icon(Icons.star, size: 14),
-                                      Icon(Icons.star, size: 14),
-                                      Icon(Icons.star_border, size: 14),
-                                      Icon(Icons.star_border, size: 14),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'ราคา',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-
-                    const SizedBox(height: 80),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
