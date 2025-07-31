@@ -162,7 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         const SizedBox(height: 24),
                         GestureDetector(
                           onTap: () {
-                            GoRouter.of(context).push('/loginphone');
+                            GoRouter.of(context).push('/login');
                           },
                           child: RichText(
                             textAlign: TextAlign.center,
