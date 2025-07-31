@@ -1,19 +1,23 @@
 // lib/screens/product_details_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
+import 'package:local_community_marketplace/providers/favorite_provider.dart';
 
-class ProductDetailsPage extends StatefulWidget {
+class ProductDetailsPage extends ConsumerStatefulWidget {
+  // ConsumerStatefulWidget
   final Map<String, dynamic> product;
 
   const ProductDetailsPage({super.key, required this.product});
 
   @override
-  State<ProductDetailsPage> createState() => _ProductDetailsPageState();
+  ConsumerState<ProductDetailsPage> createState() => _ProductDetailsPageState();
 }
 
-class _ProductDetailsPageState extends State<ProductDetailsPage> {
+class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
+  // ConsumerState
   late Map<String, dynamic> product;
   List<Map<String, dynamic>> similarProducts = [];
 
@@ -32,6 +36,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       final allProducts = snapshot.docs.map((doc) {
         final data = Map<String, dynamic>.from(doc.data());
 
+        data['id'] = doc.id;
         data['category'] = data['category'] ?? 'ไม่มีหมวดหมู่';
         data['name'] = data['name'] ?? 'ไม่มีชื่อสินค้า';
         data['location'] = data['location'] ?? 'ไม่มีสถานที่';
@@ -49,8 +54,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       // กรองสินค้าที่อยู่ในหมวดเดียวกัน และไม่ใช่สินค้าที่แสดงอยู่
       similarProducts = allProducts
           .where((p) =>
-              p['category'] == product['category'] &&
-              p['name'] != product['name'])
+              p['category'] == product['category'] && p['id'] != product['id'])
           .take(4)
           .toList();
 
@@ -66,6 +70,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         product['description']?.toString().isNotEmpty ?? false
             ? product['description']
             : 'ไม่มีรายละเอียดสินค้า';
+
+    // เช็คว่าสินค้านี้เป็น favorite หรือยัง
+    final favorites = ref.watch(favoriteProvider);
+    final isFavorite = favorites.any((item) => item['id'] == product['id']);
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
@@ -98,12 +106,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               // Image Header
               Stack(
                 children: [
-                  Image.asset(
-                    product['image'],
-                    height: 290,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  // รูปภาพแสดงสินค้า
+                  product['image'].toString().startsWith('http')
+                      ? Image.network(
+                          product['image'],
+                          height: 290,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Image.asset(
+                              'assets/images/placeholder.png',
+                              height: 290,
+                              width: double.infinity,
+                              fit: BoxFit.cover),
+                        )
+                      : Image.asset(
+                          product['image'],
+                          height: 290,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+
                   Positioned(
                     top: 16,
                     left: 8,
@@ -112,10 +134,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  const Positioned(
+
+                  // ไอคอนหัวใจ กด toggle favorite
+                  Positioned(
                     top: 16,
                     right: 8,
-                    child: Icon(Icons.favorite_border),
+                    child: IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                        size: 30,
+                      ),
+                      onPressed: () {
+                        ref
+                            .read(favoriteProvider.notifier)
+                            .toggleFavorite(product);
+                      },
+                    ),
                   ),
                 ],
               ),
