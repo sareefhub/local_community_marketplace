@@ -162,7 +162,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             size: 20,
                           ),
                           title: const Text("My favorites"),
-                          onTap: () {},
+                          onTap: () {
+                            context.go('/favorite'); // เปลี่ยนที่นี่
+                          },
                         ),
                         const SizedBox(height: 20),
                         Center(

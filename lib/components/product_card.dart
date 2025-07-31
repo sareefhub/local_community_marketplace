@@ -1,19 +1,22 @@
 // lib/components/product_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_community_marketplace/screens/product_details_screen.dart';
+import 'package:local_community_marketplace/providers/favorite_provider.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends ConsumerWidget {
   final Map<String, dynamic> product;
 
   const ProductCard({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
-    // ดึง path รูปจาก product
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favorites = ref.watch(favoriteProvider);
+    final isFav = favorites.any((item) => item['id'] == product['id']);
+
     final image = product['image']?.toString() ?? '';
 
-    // แปลง rating ให้เป็น int เพื่อป้องกัน error
     int rating = 0;
     final ratingRaw = product['rating'];
     if (ratingRaw is int) {
@@ -22,51 +25,36 @@ class ProductCard extends StatelessWidget {
       rating = ratingRaw.floor();
     }
 
-    // ฟังก์ชันสร้าง Widget รูปภาพ
     Widget buildImage() {
       if (image.isEmpty) {
-        // กรณีไม่มีรูป ให้แสดง placeholder
-        return Image.asset(
-          'assets/images/placeholder.png',
-          height: 150,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        );
+        return Image.asset('assets/images/placeholder.png',
+            height: 150, width: double.infinity, fit: BoxFit.cover);
       }
 
       if (image.startsWith('http')) {
-        // กรณีถ้าเป็น URL (ถ้ามีใช้จริง)
         return Image.network(
           image,
           height: 150,
           width: double.infinity,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
+          errorBuilder: (_, __, ___) => Image.asset(
               'assets/images/placeholder.png',
               height: 150,
               width: double.infinity,
-              fit: BoxFit.cover,
-            );
-          },
+              fit: BoxFit.cover),
         );
       }
 
-      // กรณีปกติโหลดจาก assets
       return Image.asset(
         image,
         height: 150,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          // ถ้าโหลด asset ผิดพลาด แสดง placeholder แทน
-          return Image.asset(
+        errorBuilder: (_, __, ___) => Image.asset(
             'assets/images/placeholder.png',
             height: 150,
             width: double.infinity,
-            fit: BoxFit.cover,
-          );
-        },
+            fit: BoxFit.cover),
       );
     }
 
@@ -75,8 +63,7 @@ class ProductCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ProductDetailsPage(product: product),
-          ),
+              builder: (_) => ProductDetailsPage(product: product)),
         );
       },
       child: Container(
@@ -94,10 +81,20 @@ class ProductCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: buildImage(),
                 ),
-                const Positioned(
+                Positioned(
                   top: 4,
                   right: 4,
-                  child: Icon(Icons.favorite_border),
+                  child: IconButton(
+                    icon: Icon(
+                      isFav ? Icons.favorite : Icons.favorite_border,
+                      color: isFav ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: () {
+                      ref
+                          .read(favoriteProvider.notifier)
+                          .toggleFavorite(product);
+                    },
+                  ),
                 ),
               ],
             ),

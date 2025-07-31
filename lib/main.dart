@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // ✅ เพิ่ม
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -9,9 +10,7 @@ import 'screens/profile_screen.dart';
 import 'screens/post_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/post_form_screen.dart';
-// import 'screens/login_phone_screen.dart';
-// import 'screens/register_phone_screen.dart';
-
+import 'screens/favorite_screen.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -19,7 +18,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  runApp(
+    const ProviderScope(child: MyApp()), // ✅ ห่อด้วย ProviderScope
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -58,18 +60,10 @@ class MyApp extends StatelessWidget {
           path: '/form',
           builder: (context, state) => const PostFormScreen(),
         ),
-
-        // GoRoute(
-        //   path: '/notification',
-        //   builder: (context, state) => const NotificationScreen()
-        // ),
-        // GoRoute(path: '/chat',
-        //   builder: (context, state) => const ChatScreen()
-        // ),
-        // GoRoute(
-        //   path: '/loginphone',
-        //   builder: (context, state) => LoginPhoneScreen(),
-        // ),
+        GoRoute(
+          path: '/favorite',
+          builder: (context, state) => const FavoriteScreen(),
+        ),
       ],
     );
 

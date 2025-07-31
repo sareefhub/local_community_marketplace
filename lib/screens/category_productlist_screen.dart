@@ -1,48 +1,30 @@
 // lib/screens/category_productlist_screen.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
+import 'package:local_community_marketplace/providers/favorite_provider.dart';
 
-class CategoryProductListScreen extends StatelessWidget {
+class CategoryProductListScreen extends ConsumerWidget {
   final String categoryName;
 
   const CategoryProductListScreen({super.key, required this.categoryName});
 
-  Future<List<Map<String, dynamic>>> fetchProductsByCategory() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('products')
-        .where('category', isEqualTo: categoryName)
-        .get();
-
-    return snapshot.docs.map((doc) {
-      final data = Map<String, dynamic>.from(doc.data());
-
-      // กำหนดค่า default เผื่อบางฟิลด์ขาด
-      return {
-        'name': data['name'] ?? 'ไม่มีชื่อ',
-        'category': data['category'] ?? '',
-        'location': data['location'] ?? '',
-        'price': data['price'] ?? '',
-        'rating': (data['rating'] is num) ? data['rating'] : 0,
-        'image': data['image'] ?? 'assets/images/placeholder.png',
-        'description': data['description'] ?? '',
-        'sellerName': data['sellerName'] ?? '',
-        'sellerImage':
-            data['sellerImage'] ?? 'assets/images/placeholder_seller.png',
-      };
-    }).toList();
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ฟังสถานะรายการโปรด (favorite)
+    final favorites = ref.watch(favoriteProvider);
+
+    // ฟังสถานะข้อมูลสินค้าจาก provider (โหลดสินค้าตาม category)
+    final productListAsync = ref.watch(productListProvider(categoryName));
+
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
       body: SafeArea(
         child: Column(
           children: [
-            // Custom AppBar
+            // AppBar แบบกำหนดเอง
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -62,12 +44,12 @@ class CategoryProductListScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  const SizedBox(width: 48), // เว้นที่ว่างทางขวา
                 ],
               ),
             ),
 
-            // Search + Filter
+            // Search + Filter Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -113,23 +95,10 @@ class CategoryProductListScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Product Grid (from Firebase)
+            // แสดงสินค้าเป็น GridView
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: fetchProductsByCategory(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('เกิดข้อผิดพลาด: ${snapshot.error}'),
-                    );
-                  }
-
-                  final productList = snapshot.data ?? [];
-
+              child: productListAsync.when(
+                data: (productList) {
                   if (productList.isEmpty) {
                     return const Center(
                       child: Text('ไม่มีสินค้าสำหรับหมวดนี้'),
@@ -150,6 +119,8 @@ class CategoryProductListScreen extends StatelessWidget {
                     ),
                   );
                 },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text('เกิดข้อผิดพลาด: $e')),
               ),
             ),
           ],
