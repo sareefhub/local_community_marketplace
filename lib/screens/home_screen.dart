@@ -20,8 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return snapshot.docs.map((doc) {
       final data = Map<String, dynamic>.from(doc.data());
+      data['id'] = doc.id;
 
-      // กำหนดค่า default หากข้อมูลขาดหรือ null
       data['category'] = data['category'] ?? 'ไม่มีหมวดหมู่';
       data['name'] = data['name'] ?? 'ไม่มีชื่อสินค้า';
       data['location'] = data['location'] ?? 'ไม่มีสถานที่';

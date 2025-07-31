@@ -12,15 +12,26 @@ class FavoriteNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
   void toggleFavorite(Map<String, dynamic> product) {
     final exists = state.any((item) => item['id'] == product['id']);
+
     if (exists) {
       state = state.where((item) => item['id'] != product['id']).toList();
     } else {
-      state = [...state, product];
-    }
-  }
+      // สร้าง Map ใหม่ให้มีเฉพาะข้อมูลที่ต้องการเก็บ
+      final normalizedProduct = {
+        'id': product['id'],
+        'name': product['name'],
+        'category': product['category'],
+        'location': product['location'],
+        'price': product['price'],
+        'rating': product['rating'],
+        'image': product['image'],
+        'description': product['description'],
+        'sellerName': product['sellerName'],
+        'sellerImage': product['sellerImage'],
+      };
 
-  bool isFavorite(Map<String, dynamic> product) {
-    return state.any((item) => item['id'] == product['id']);
+      state = [...state, normalizedProduct];
+    }
   }
 }
 
