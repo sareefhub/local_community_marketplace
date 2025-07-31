@@ -1,11 +1,10 @@
-// lib/screens/home
+// lib/screens/home.dart
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
+import 'package:local_community_marketplace/components/product_card.dart';
+import 'package:local_community_marketplace/components/category_list.dart';
 import 'package:local_community_marketplace/dummy_products.dart';
 import 'package:local_community_marketplace/dummy_categories.dart';
-import 'package:local_community_marketplace/screens/category_productlist_screen.dart';
-import 'package:local_community_marketplace/components/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,102 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // Categories
+            // Categories Component
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Category Title
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 26),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'หมวดหมู่',
-                          style: GoogleFonts.sarabun(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Horizontal Category Scroll
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: SizedBox(
-                        height: 100,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                List.generate(categoryList.length, (index) {
-                              final category = categoryList[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 12),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            CategoryProductListScreen(
-                                          categoryName: category['label'],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        height: 50,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black12,
-                                              blurRadius: 4,
-                                              offset: Offset(2, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          child: Image.asset(
-                                            category['image']!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      SizedBox(
-                                        width: 60,
-                                        child: Text(
-                                          category['label']!,
-                                          style: const TextStyle(fontSize: 12),
-                                          textAlign: TextAlign.center,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ),
-                    ),
+                    CategoryList(categories: categoryList),
 
                     const SizedBox(height: 16),
 
-                    // Product recommnend Section
+                    // Product recommend Section
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GridView.count(
@@ -174,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }),
                       ),
                     ),
+
                     const SizedBox(height: 8),
 
                     // Product Cards Example
