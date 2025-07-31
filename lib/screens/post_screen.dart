@@ -81,7 +81,7 @@ class PostScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.bottomLeft,
-                    child: _buildStatusButton(status),
+                    child: _buildStatusLabel(status),
                   ),
                 ],
               ),
@@ -92,46 +92,34 @@ class PostScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusButton(String status) {
-    Color? bgColor;
-    Color textColor = Colors.black;
-    OutlinedBorder shape =
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8));
-    ButtonStyle style;
+  Widget _buildStatusLabel(String status) {
+    Color bgColor;
+    Color borderColor = const Color(0xFF062252); // ขอบสีน้ำเงินเข้ม
 
     switch (status) {
       case 'Post':
-        style = ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFB9E8C9),
-          foregroundColor: Colors.black,
-          shape: shape,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        );
-        return ElevatedButton(
-            onPressed: () {}, style: style, child: const Text('Post'));
-
+        bgColor = const Color(0xFFB9E8C9); // เขียวอ่อน
+        break;
       case 'Wait':
-        style = OutlinedButton.styleFrom(
-          backgroundColor: const Color(0xFFDCEFF3),
-          foregroundColor: Colors.black,
-          side: const BorderSide(color: Colors.transparent),
-          shape: shape,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        );
-        return OutlinedButton(
-            onPressed: () {}, style: style, child: const Text('Wait'));
-
+        bgColor = const Color(0xFFDCEFF3); // ฟ้าอ่อน
+        break;
       case 'Draft':
       default:
-        style = OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          side: const BorderSide(color: Colors.black),
-          shape: shape,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        );
-        return OutlinedButton(
-            onPressed: () {}, style: style, child: const Text('Draft'));
+        bgColor = Colors.white;
+        break;
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor), // ✅ ขอบน้ำเงินเข้ม
+      ),
+      child: Text(
+        status,
+        style: const TextStyle(fontSize: 12, color: Colors.black),
+      ),
+    );
   }
 }
