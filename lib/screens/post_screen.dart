@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
+import 'package:go_router/go_router.dart';
 
 class PostScreen extends StatelessWidget {
   const PostScreen({super.key});
@@ -21,7 +22,7 @@ class PostScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add, color: Colors.black),
             onPressed: () {
-              // เปิดหน้าสร้างโพสต์ใหม่
+              context.go('/choose_photo'); // ← ใช้ go_router แทน
             },
           ),
         ],
@@ -54,7 +55,6 @@ class PostScreen extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Placeholder
             Container(
               width: 60,
               height: 60,
@@ -64,7 +64,6 @@ class PostScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            // Product Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,14 +93,14 @@ class PostScreen extends StatelessWidget {
 
   Widget _buildStatusLabel(String status) {
     Color bgColor;
-    Color borderColor = const Color(0xFF062252); // ขอบสีน้ำเงินเข้ม
+    Color borderColor = const Color(0xFF062252);
 
     switch (status) {
       case 'Post':
-        bgColor = const Color(0xFFB9E8C9); // เขียวอ่อน
+        bgColor = const Color(0xFFB9E8C9);
         break;
       case 'Wait':
-        bgColor = const Color(0xFFDCEFF3); // ฟ้าอ่อน
+        bgColor = const Color(0xFFDCEFF3);
         break;
       case 'Draft':
       default:
@@ -114,7 +113,7 @@ class PostScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor), // ✅ ขอบน้ำเงินเข้ม
+        border: Border.all(color: borderColor),
       ),
       child: Text(
         status,

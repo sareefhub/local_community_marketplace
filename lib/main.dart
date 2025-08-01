@@ -12,6 +12,7 @@ import 'screens/post_screen.dart';
 import 'screens/edit_profile_screen.dart';
 import 'screens/post_form_screen.dart';
 import 'screens/favorite_screen.dart';
+import 'screens/choose_photo_screen.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -69,6 +70,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/favorite',
           builder: (context, state) => const FavoriteScreen(),
+        ),
+        GoRoute(
+          path: '/choose_photo',
+          builder: (context, state) => const ChoosePhotoScreen(),
         ),
       ],
     );
