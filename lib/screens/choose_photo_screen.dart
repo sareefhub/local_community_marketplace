@@ -1,8 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class ChoosePhotoScreen extends StatelessWidget {
+class ChoosePhotoScreen extends StatefulWidget {
   const ChoosePhotoScreen({super.key});
+
+  @override
+  State<ChoosePhotoScreen> createState() => _ChoosePhotoScreenState();
+}
+
+class _ChoosePhotoScreenState extends State<ChoosePhotoScreen> {
+  final List<XFile> _images = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pickImages(); // แสดงภาพทันทีเมื่อเปิดหน้านี้
+  }
+
+  Future<void> _pickImages() async {
+    final ImagePicker picker = ImagePicker();
+    final List<XFile> pickedImages = await picker.pickMultiImage();
+
+    if (pickedImages.isNotEmpty) {
+      setState(() {
+        _images.addAll(pickedImages);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +45,7 @@ class ChoosePhotoScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () => context.pop(), // ← ย้อนกลับด้วย go_router
+                    onPressed: () => context.go('/post'),
                     child: const Text(
                       'Cancel',
                       style: TextStyle(
@@ -46,7 +72,7 @@ class ChoosePhotoScreen extends StatelessWidget {
                       height: 24,
                     ),
                     onPressed: () {
-                      context.go('/form'); // ← ไปหน้าฟอร์ม
+                      context.go('/form');
                     },
                   ),
                 ),
@@ -62,18 +88,50 @@ class ChoosePhotoScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GridView.builder(
-                itemCount: 12,
+                itemCount: _images.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),
                 itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F1F1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F1F1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        clipBehavior: Clip.hardEdge,
+                        child: Image.file(
+                          File(_images[index].path),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF062252),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '${index + 1}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
