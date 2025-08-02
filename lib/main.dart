@@ -8,13 +8,15 @@ import 'screens/home/home_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/login_phone_screen.dart';
 import 'screens/profile_screen.dart';
-import 'screens/post_screen.dart';
+import 'screens/post/post_screen.dart';
 import 'screens/edit_profile_screen.dart';
-import 'screens/post_form_screen.dart';
+import 'screens/post/post_form_screen.dart';
 import 'screens/favorite_screen.dart';
-import 'screens/choose_photo_screen.dart';
+import 'screens/post/choose_photo_screen.dart';
+import 'screens/post/edit_post_form_screen.dart';  // ✅ เพิ่มบรรทัดนี้
 
 import 'package:go_router/go_router.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,7 +66,7 @@ class MyApp extends StatelessWidget {
           builder: (context, state) => const EditProfileScreen(),
         ),
         GoRoute(
-          path: '/form',
+          path: '/postform',
           builder: (context, state) => const PostFormScreen(),
         ),
         GoRoute(
@@ -74,6 +76,13 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/choose_photo',
           builder: (context, state) => const ChoosePhotoScreen(),
+        ),
+        GoRoute(
+          path: '/postedit/:id',
+          builder: (context, state) {
+            final postId = state.pathParameters['id']!;
+            return EditPostFormScreen(postId: postId);
+          },
         ),
       ],
     );
