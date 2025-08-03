@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_community_marketplace/utils/user_session.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -14,6 +17,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
 
   bool _isLoading = true;
   bool _isSaving = false;
@@ -34,15 +40,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+
+      // อัปโหลดไปยัง Firebase Storage
+      final fileName = 'profile_images/$userId.jpg';
+      final ref = FirebaseStorage.instance.ref().child(fileName);
+      await ref.putFile(_selectedImage!);
+      final downloadURL = await ref.getDownloadURL();
+
+      // อัปเดต Firestore
+      await _firestore.collection('users').doc(userId).update({
+        'profileImageUrl': downloadURL,
+      });
+
+      // อัปเดต UserSession ด้วย
+      UserSession.profileImageUrl = downloadURL;
+
+      setState(() {
+        _profileImageUrl = downloadURL;
+      });
+    }
+  }
+
   Future<void> _loadUserProfile() async {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
       if (doc.exists) {
         final data = doc.data()!;
         _usernameController.text = data['username'] ?? '';
-        // ถ้าไม่มี editPhone ให้ fallback ใช้ registerPhone
         _phoneController.text = data['editPhone'] ?? data['phone'] ?? '';
         _profileImageUrl = data['profileImageUrl'];
+
+        // อัปเดต UserSession profileImageUrl ด้วย
+        UserSession.profileImageUrl = _profileImageUrl;
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,8 +122,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       await _firestore.collection('users').doc(userId).update({
         'username': _usernameController.text.trim(),
-        'editPhone': _phoneController.text.trim(), // แยกจากเบอร์ register
+        'editPhone': _phoneController.text.trim(),
       });
+
+      // อัปเดต UserSession
+      UserSession.username = _usernameController.text.trim();
+      UserSession.phone = _phoneController.text.trim();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile updated successfully')),
@@ -132,13 +171,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.white,
-              backgroundImage: _profileImageUrl != null
-                  ? NetworkImage(_profileImageUrl!)
-                  : const AssetImage('assets/icons/circle-user.png')
-                      as ImageProvider,
+            GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.white,
+                backgroundImage: _selectedImage != null
+                    ? FileImage(_selectedImage!)
+                    : _profileImageUrl != null
+                        ? NetworkImage(_profileImageUrl!)
+                        : const AssetImage('assets/icons/circle-user.png')
+                            as ImageProvider,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.edit, size: 16),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 30),
             Row(

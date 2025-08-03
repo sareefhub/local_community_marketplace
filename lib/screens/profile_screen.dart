@@ -17,7 +17,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? username;
   String? userId;
   String? phone;
-
   bool isLoading = true;
 
   @override
@@ -31,7 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isLoading = true;
     });
 
-    // สมมติ userId มาจาก UserSession (ถ้ามี)
     final currentUserId = UserSession.userId;
 
     if (currentUserId != null) {
@@ -43,11 +41,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             username = data['username'] ?? UserSession.username;
             userId = currentUserId;
-            phone = data['phone'] ?? UserSession.phone;
+            phone = data['editPhone'] ?? data['phone'] ?? UserSession.phone;
+            UserSession.profileImageUrl = data['profileImageUrl'];
           });
         }
       } catch (e) {
-        // ถ้า error ให้ fallback เป็นข้อมูลเดิมจาก UserSession
         setState(() {
           username = UserSession.username;
           userId = currentUserId;
@@ -84,13 +82,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: const Color(0xFFE0F3F7),
                     child: Row(
                       children: [
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 35,
-                          backgroundColor: Colors.grey,
-                          child: ImageIcon(
-                            AssetImage('assets/icons/user.png'),
-                            size: 35,
-                          ),
+                          backgroundColor: Colors.grey[300],
+                          backgroundImage: UserSession.profileImageUrl != null
+                              ? NetworkImage(UserSession.profileImageUrl!)
+                              : const AssetImage('assets/icons/user.png')
+                                  as ImageProvider,
                         ),
                         const SizedBox(width: 16),
                         Column(
@@ -117,9 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const Spacer(),
                         ElevatedButton.icon(
                           onPressed: () async {
-                            // รอผลลัพธ์กลับมาจากหน้า edit_profile
                             await context.push('/edit_profile');
-                            // โหลดข้อมูลใหม่หลังแก้ไขเสร็จ
                             await _loadUserData();
                           },
                           icon: const ImageIcon(
@@ -163,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           title: const Text("My favorites"),
                           onTap: () {
-                            context.go('/favorite'); // เปลี่ยนที่นี่
+                            context.go('/favorite');
                           },
                         ),
                         const SizedBox(height: 20),
