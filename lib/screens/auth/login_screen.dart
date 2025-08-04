@@ -7,6 +7,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ฟังก์ชันสำหรับสร้าง Style ปุ่มที่ใช้ซ้ำ
     buttonStyle({Color? bg, Color? fg, BorderSide? border}) => ElevatedButton.styleFrom(
       backgroundColor: bg ?? Colors.white,
       foregroundColor: fg ?? Colors.black,
@@ -19,6 +20,7 @@ class LoginScreen extends StatelessWidget {
       ),
     );
 
+    // ฟังก์ชันสำหรับสร้างปุ่มพร้อมไอคอน เช่น Google, Facebook
     buildIconButton(String label, String asset, VoidCallback onTap) => ElevatedButton.icon(
       onPressed: onTap,
       icon: Image.asset(asset, height: 24),
@@ -34,12 +36,16 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // โลโก้แอป
                 Image.asset('assets/logo-splash.png', height: 120),
                 const SizedBox(height: 48),
+                // ปุ่มล็อกอินด้วย Google
                 buildIconButton('Continue with Google', 'assets/icons/search.png', () {}),
                 const SizedBox(height: 16),
+                // ปุ่มล็อกอินด้วย Facebook
                 buildIconButton('Continue with Facebook', 'assets/icons/facebook.png', () {}),
                 const SizedBox(height: 24),
+                // เส้นคั่นกับข้อความ "or"
                 const Row(
                   children: [
                     Expanded(child: Divider(color: Colors.grey, height: 1)),
@@ -51,12 +57,14 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
+                // ปุ่มล็อกอินด้วยเบอร์โทรศัพท์
                 ElevatedButton(
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LoginPhoneScreen())),
                   style: buttonStyle(bg: Colors.blue.shade100),
                   child: const Text("Log in With Phone Number"),
                 ),
                 const SizedBox(height: 32),
+                // ลิงก์ไปสมัครสมาชิก
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

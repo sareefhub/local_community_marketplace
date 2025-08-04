@@ -12,9 +12,11 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final phoneController = TextEditingController();
 
+  // ฟังก์ชันสมัครสมาชิกด้วยเบอร์โทรศัพท์
   Future<void> registerWithPhone(BuildContext context) async {
     final phone = phoneController.text.trim();
     if (phone.isEmpty) {
+      // ถ้าไม่ได้กรอกเบอร์โทรศัพท์
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('⚠ กรุณากรอกเบอร์โทรศัพท์')),
       );
@@ -23,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     final firestore = FirebaseFirestore.instance;
     try {
+      // ตรวจสอบว่าเบอร์นี้มีในระบบแล้วหรือยัง
       final exists = (await firestore
               .collection('users')
               .where('phone', isEqualTo: phone)
@@ -30,6 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           .docs
           .isNotEmpty;
       if (exists) {
+        // ถ้ามีแล้ว ห้ามสมัครซ้ำ
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('❗ เบอร์นี้ถูกใช้แล้ว')),
         );
@@ -38,6 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       int newId = 0;
       String newUser = '';
+      // สร้างผู้ใช้ใหม่และอัปเดตตัวนับ id ด้วย Transaction (ป้องกันปัญหา race condition)
       await firestore.runTransaction((t) async {
         final counterRef = firestore.collection('counters').doc('users');
         final counterSnap = await t.get(counterRef);
@@ -47,18 +52,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
         newId = lastId + 1;
         newUser = 'user$newId';
 
+        // สร้าง user document ใหม่ใน Firestore
         t.set(firestore.collection('users').doc(newUser), {
           'phone': phone,
           'userId': newId.toString(),
           'username': newUser,
         });
+        // อัปเดต lastUserId ใน counter
         t.set(counterRef, {'lastUserId': newId});
       });
 
+      // แจ้งเตือนสำเร็จ
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('✅ ลงทะเบียนสำเร็จ')),
       );
     } catch (e) {
+      // แจ้งเตือนถ้าเกิดข้อผิดพลาด
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('⚠ เกิดข้อผิดพลาด: ${e.toString()}')),
       );
@@ -73,6 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // สร้าง Style ปุ่มมาตรฐาน
     buttonStyle({Color? bg, Color? fg, BorderSide? border}) => ElevatedButton.styleFrom(
           backgroundColor: bg,
           foregroundColor: fg,
@@ -84,6 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
 
+    // สร้างปุ่มแบบมีไอคอน
     buildButton(String label, String asset, VoidCallback onTap) => ElevatedButton.icon(
           onPressed: onTap,
           style: buttonStyle(
@@ -120,6 +131,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 30),
+                        // กล่องรับเบอร์โทรศัพท์
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -138,6 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        // ปุ่มสมัครสมาชิก
                         Center(
                           child: ElevatedButton(
                             onPressed: () => registerWithPhone(context),
@@ -149,6 +162,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 30),
+                        // เส้นคั่นกับข้อความ 'or'
                         Row(
                           children: const [
                             Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
@@ -160,10 +174,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                         const SizedBox(height: 30),
+                        // ปุ่มสมัครด้วย Google, Facebook (demo)
                         buildButton('Continue with Google', 'assets/icons/search.png', () {}),
                         const SizedBox(height: 16),
                         buildButton('Continue with Facebook', 'assets/icons/facebook.png', () {}),
                         const SizedBox(height: 24),
+                        // ลิงก์ไปหน้า Login
                         GestureDetector(
                           onTap: () {
                             GoRouter.of(context).push('/login');
