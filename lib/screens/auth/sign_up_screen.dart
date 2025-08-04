@@ -36,12 +36,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return;
       }
 
+      int newId = 0;
+      String newUser = '';
       await firestore.runTransaction((t) async {
         final counterRef = firestore.collection('counters').doc('users');
         final counterSnap = await t.get(counterRef);
-        final lastId = (counterSnap.exists ? counterSnap.get('lastUserId') : 0) ?? 0;
-        final newId = lastId + 1;
-        final newUser = 'user$newId';
+        final lastId = (counterSnap.exists && counterSnap.data()?['lastUserId'] != null)
+            ? int.tryParse(counterSnap.data()!['lastUserId'].toString()) ?? 0
+            : 0;
+        newId = lastId + 1;
+        newUser = 'user$newId';
 
         t.set(firestore.collection('users').doc(newUser), {
           'phone': phone,
