@@ -94,7 +94,7 @@ class _ChoosePhotoScreenState extends State<ChoosePhotoScreen> {
                     ),
                     onPressed: _selectedImages.isNotEmpty
                         ? () {
-                            context.go('/form',
+                            context.push('/postform',
                                 extra:
                                     _selectedImages); // ส่งภาพที่เลือกไปยัง PostFormScreen
                           }
