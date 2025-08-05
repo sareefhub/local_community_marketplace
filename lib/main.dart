@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:go_router/go_router.dart';
+
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/login_phone_screen.dart';
@@ -13,10 +16,7 @@ import 'screens/edit_profile_screen.dart';
 import 'screens/post/post_form_screen.dart';
 import 'screens/favorite_screen.dart';
 import 'screens/post/choose_photo_screen.dart';
-import 'screens/post/edit_post_form_screen.dart';  // ✅ เพิ่มบรรทัดนี้
-
-import 'package:go_router/go_router.dart';
-
+import 'screens/post/edit_post_form_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +24,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-    const ProviderScope(child: MyApp()),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,11 +33,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter _router = GoRouter(
-      initialLocation: '/home',
+      initialLocation: '/',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const OnboardingScreen(),
         ),
         GoRoute(
           path: '/home',
