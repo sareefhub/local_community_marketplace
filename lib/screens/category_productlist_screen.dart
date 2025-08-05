@@ -5,19 +5,75 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/providers/favorite_provider.dart';
+import 'package:local_community_marketplace/components/search_filter_sort_bar.dart';
+import 'package:local_community_marketplace/screens/filter_screen.dart';
 
-class CategoryProductListScreen extends ConsumerWidget {
+class CategoryProductListScreen extends ConsumerStatefulWidget {
   final String categoryName;
 
   const CategoryProductListScreen({super.key, required this.categoryName});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // ฟังสถานะรายการโปรด (favorite)
-    final favorites = ref.watch(favoriteProvider);
+  ConsumerState<CategoryProductListScreen> createState() =>
+      _CategoryProductListScreenState();
+}
 
-    // ฟังสถานะข้อมูลสินค้าจาก provider (โหลดสินค้าตาม category)
-    final productListAsync = ref.watch(productListProvider(categoryName));
+class _CategoryProductListScreenState
+    extends ConsumerState<CategoryProductListScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  Map<String, dynamic> _filters = {};
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onFilterPressed() async {
+    final filters = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FilterScreen(
+          initialCategory: widget.categoryName, // ส่งค่า categoryName ที่เปิดมา
+        ),
+      ),
+    );
+
+    if (filters != null) {
+      setState(() {
+        _filters = filters;
+      });
+    }
+  }
+
+  void _onSortPressed() {
+    // TODO: แสดงตัวเลือกการเรียงลำดับ
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('เรียงลำดับ'),
+        content: const Text('ใส่ฟังก์ชันเรียงลำดับที่นี่'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('ปิด')),
+        ],
+      ),
+    );
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchQuery = value;
+    });
+    // TODO: ทำการ filter product list ตาม _searchQuery
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final productListAsync =
+        ref.watch(productListProvider(widget.categoryName));
 
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
@@ -36,7 +92,7 @@ class CategoryProductListScreen extends ConsumerWidget {
                   Expanded(
                     child: Center(
                       child: Text(
-                        categoryName,
+                        widget.categoryName,
                         style: GoogleFonts.sarabun(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
@@ -44,65 +100,57 @@ class CategoryProductListScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // เว้นที่ว่างทางขวา
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
 
-            // Search + Filter Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'ค้นหา',
-                        prefixIcon: const Icon(Icons.search),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    height: 48,
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.filter_alt_outlined),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    height: 48,
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.sort),
-                  ),
-                ],
-              ),
+            // นำ SearchFilterSortBar มาใช้
+            SearchFilterSortBar(
+              searchController: _searchController,
+              onFilterPressed: _onFilterPressed,
+              onSortPressed: _onSortPressed,
+              onSearchChanged: _onSearchChanged,
             ),
 
             const SizedBox(height: 16),
 
-            // แสดงสินค้าเป็น GridView
             Expanded(
               child: productListAsync.when(
                 data: (productList) {
-                  if (productList.isEmpty) {
+                  final filteredList = productList.where((product) {
+                    final name =
+                        product['name']?.toString().toLowerCase() ?? '';
+                    final matchesSearch =
+                        name.contains(_searchQuery.toLowerCase());
+
+                    final category = _filters['category']?.toString() ?? '';
+                    final province = _filters['province']?.toString() ?? '';
+
+                    String priceStr = product['price']?.toString() ?? '0';
+                    priceStr = priceStr.replaceAll(RegExp(r'[^\d.]'), '');
+                    final price = double.tryParse(priceStr) ?? 0;
+
+                    final minPrice =
+                        double.tryParse(_filters['minPrice'] ?? '') ?? 0;
+                    final maxPrice =
+                        double.tryParse(_filters['maxPrice'] ?? '') ??
+                            double.infinity;
+
+                    final matchesCategory =
+                        category.isEmpty || product['category'] == category;
+                    final matchesProvince =
+                        province.isEmpty || product['location'] == province;
+                    final matchesPrice = price >= minPrice && price <= maxPrice;
+
+                    return matchesSearch &&
+                        matchesCategory &&
+                        matchesProvince &&
+                        matchesPrice;
+                  }).toList();
+                  if (filteredList.isEmpty) {
                     return const Center(
-                      child: Text('ไม่มีสินค้าสำหรับหมวดนี้'),
-                    );
+                        child: Text('ไม่มีสินค้าสำหรับหมวดนี้'));
                   }
 
                   return Padding(
@@ -112,8 +160,8 @@ class CategoryProductListScreen extends ConsumerWidget {
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
                       childAspectRatio: 0.60,
-                      children: List.generate(productList.length, (index) {
-                        final product = productList[index];
+                      children: List.generate(filteredList.length, (index) {
+                        final product = filteredList[index];
                         return ProductCard(product: product);
                       }),
                     ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/components/category_list.dart';
+import 'package:local_community_marketplace/screens/search_screen.dart';
 
 class HomeScreenMobile extends StatefulWidget {
   const HomeScreenMobile({super.key});
@@ -66,16 +67,28 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'ค้นหา',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide.none,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SearchScreen()),
+                  );
+                },
+                child: AbsorbPointer(
+                  // ป้องกัน TextField ถูกแก้ไข
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'ค้นหา',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
                 ),
               ),
