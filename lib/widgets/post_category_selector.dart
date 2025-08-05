@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
-import '/dummy_categories.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<String?> showPostCategoryDialog(BuildContext context) async {
+  final firestore = FirebaseFirestore.instance;
+  
+  // ดึงข้อมูลหมวดหมู่จาก Firestore
+  final categorySnapshot = await firestore.collection('categories').get();
+  
+  // แปลงข้อมูลจาก Firestore ให้เป็น List
+  final List<Map<String, dynamic>> categories = categorySnapshot.docs.map((doc) {
+    return {
+      'label': doc['label'], // ชื่อหมวดหมู่
+      'image': doc['image'], // URL ของภาพหมวดหมู่
+    };
+  }).toList();
+
   final selected = await showDialog<String>(
     context: context,
     builder: (context) => Dialog(
@@ -31,12 +44,12 @@ Future<String?> showPostCategoryDialog(BuildContext context) async {
         body: Container(
           color: Colors.white,  // กำหนดพื้นหลังเป็นสีขาว
           child: ListView.builder(
-            itemCount: dummyCategories.length,
+            itemCount: categories.length,
             itemBuilder: (context, index) {
-              final category = dummyCategories[index];
+              final category = categories[index];
               return ListTile(
-                leading: Image.asset(
-                  category['image'],
+                leading: Image.network(
+                  category['image'],  // ใช้ภาพจาก URL
                   width: 24,
                   height: 24,
                   errorBuilder: (context, error, stackTrace) =>
