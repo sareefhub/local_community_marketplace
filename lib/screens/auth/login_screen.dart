@@ -53,7 +53,6 @@ class LoginScreen extends StatelessWidget {
                   }
                 }),
                 const SizedBox(height: 16),
-                buildIconButton('Continue with Facebook', 'assets/icons/facebook.png', () {}),
                 const SizedBox(height: 24),
                 const Row(
                   children: [

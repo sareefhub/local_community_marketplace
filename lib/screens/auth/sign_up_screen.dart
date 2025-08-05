@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_community_marketplace/services/google_sign_in_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -74,6 +75,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  // ฟังก์ชันสำหรับ Google Sign-In
+  Future<void> signInWithGoogle(BuildContext context) async {
+    final userCredential = await GoogleSignInService.signInWithGoogle();
+    if (userCredential != null) {
+      // เซ็ตค่า session และนำผู้ใช้ไปหน้า Home
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Google login success!')),
+      );
+      context.go('/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('❌ Google login failed!')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     phoneController.dispose();
@@ -84,8 +101,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     // สร้าง Style ปุ่มมาตรฐาน
     buttonStyle({Color? bg, Color? fg, BorderSide? border}) => ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
+          backgroundColor: bg ?? Colors.white,
+          foregroundColor: fg ?? Colors.black,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
@@ -174,11 +191,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                         const SizedBox(height: 30),
-                        // ปุ่มสมัครด้วย Google, Facebook (demo)
-                        buildButton('Continue with Google', 'assets/icons/search.png', () {}),
+                        // ปุ่มสมัครด้วย Google
+                        buildButton('Continue with Google', 'assets/icons/search.png', () => signInWithGoogle(context)),
                         const SizedBox(height: 16),
-                        buildButton('Continue with Facebook', 'assets/icons/facebook.png', () {}),
-                        const SizedBox(height: 24),
                         // ลิงก์ไปหน้า Login
                         GestureDetector(
                           onTap: () {
