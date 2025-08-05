@@ -34,15 +34,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (currentUserId != null) {
       try {
-        final doc =
-            await _firestore.collection('users').doc(currentUserId).get();
+        final doc = await _firestore.collection('users').doc(currentUserId).get();
         if (doc.exists) {
           final data = doc.data()!;
           setState(() {
             username = data['username'] ?? UserSession.username;
-            userId = currentUserId;
+            userId = data['userId'] ?? currentUserId;
             phone = data['editPhone'] ?? data['phone'] ?? UserSession.phone;
             UserSession.profileImageUrl = data['profileImageUrl'];
+          });
+        } else {
+          // กรณี doc ไม่มีข้อมูล ให้ fallback
+          setState(() {
+            username = UserSession.username;
+            userId = currentUserId;
+            phone = UserSession.phone;
           });
         }
       } catch (e) {
@@ -87,8 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.grey[300],
                           backgroundImage: UserSession.profileImageUrl != null
                               ? NetworkImage(UserSession.profileImageUrl!)
-                              : const AssetImage('assets/icons/user.png')
-                                  as ImageProvider,
+                              : const AssetImage('assets/icons/user.png') as ImageProvider,
                         ),
                         const SizedBox(width: 16),
                         Column(
@@ -96,18 +101,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             const Text(
                               'User',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.black),
+                              style: TextStyle(fontSize: 14, color: Colors.black),
                             ),
                             Text(
                               username ?? 'Guest',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
+                            // แสดง userId เสมอถ้ามี
                             Text(
-                              userId != null
-                                  ? 'User ID\n$userId'
-                                  : 'Not logged in',
+                              userId != null ? 'User ID\n$userId' : '',
                               style: const TextStyle(fontSize: 12),
                             ),
                           ],
@@ -181,8 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                               child: Text(isLoggedIn ? 'Log Out' : 'Log In'),
                             ),
                           ),

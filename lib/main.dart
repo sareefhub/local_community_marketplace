@@ -5,11 +5,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 
 import 'firebase_options.dart';
+
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/login_phone_screen.dart';
+import 'screens/auth/sign_up_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/post/post_screen.dart';
 import 'screens/edit_profile_screen.dart';
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter _router = GoRouter(
-      initialLocation: '/',
+      initialLocation: '/home',
       routes: [
         GoRoute(
           path: '/',
@@ -54,6 +56,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/loginphone',
           builder: (context, state) => LoginPhoneScreen(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => const SignUpScreen(),
         ),
         GoRoute(
           path: '/profile',

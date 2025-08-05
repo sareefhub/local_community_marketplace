@@ -24,14 +24,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
 
-  String? userId;
+  String? userDocId; // เก็บ id เอกสาร Firestore ของ user
+  String? _userIdFromFirestore; // เก็บ userId จากข้อมูลใน Firestore
   String? _profileImageUrl;
 
   @override
   void initState() {
     super.initState();
-    userId = UserSession.userId;
-    if (userId != null) {
+    userDocId = UserSession.userId;
+    if (userDocId != null) {
       _loadUserProfile();
     } else {
       setState(() {
@@ -42,19 +43,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+    if (pickedFile != null && userDocId != null) {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
 
       // อัปโหลดไปยัง Firebase Storage
-      final fileName = 'profile_images/$userId.jpg';
+      final fileName = 'profile_images/$userDocId.jpg';
       final ref = FirebaseStorage.instance.ref().child(fileName);
       await ref.putFile(_selectedImage!);
       final downloadURL = await ref.getDownloadURL();
 
       // อัปเดต Firestore
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('users').doc(userDocId).update({
         'profileImageUrl': downloadURL,
       });
 
@@ -69,12 +70,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _loadUserProfile() async {
     try {
-      final doc = await _firestore.collection('users').doc(userId).get();
+      final doc = await _firestore.collection('users').doc(userDocId).get();
       if (doc.exists) {
         final data = doc.data()!;
         _usernameController.text = data['username'] ?? '';
         _phoneController.text = data['editPhone'] ?? data['phone'] ?? '';
         _profileImageUrl = data['profileImageUrl'];
+        _userIdFromFirestore = data['userId'];
 
         // อัปเดต UserSession profileImageUrl ด้วย
         UserSession.profileImageUrl = _profileImageUrl;
@@ -112,7 +114,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
-    if (userId == null) return;
+    if (userDocId == null) return;
     if (!_validateInput()) return;
 
     setState(() {
@@ -120,7 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
 
     try {
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('users').doc(userDocId).update({
         'username': _usernameController.text.trim(),
         'editPhone': _phoneController.text.trim(),
       });
@@ -201,7 +203,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const Text('User ID',
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(width: 10),
-                Text(userId ?? 'N/A'),
+                Text(_userIdFromFirestore ?? 'N/A'),
               ],
             ),
             const SizedBox(height: 20),
