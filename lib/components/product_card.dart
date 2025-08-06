@@ -104,17 +104,25 @@ class ProductCard extends ConsumerWidget {
                     Positioned(
                       top: 4,
                       right: 4,
-                      child: IconButton(
-                        iconSize: favoriteIconSize,
-                        icon: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          color: isFav ? Colors.red : Colors.grey,
+                      child: Container(
+                        width: favoriteIconSize + 8,
+                        height: favoriteIconSize + 8,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.3),
+                          shape: BoxShape.circle,
                         ),
-                        onPressed: () {
-                          ref
-                              .read(favoriteProvider.notifier)
-                              .toggleFavorite(product);
-                        },
+                        child: IconButton(
+                          padding: EdgeInsets.all(4),
+                          iconSize: favoriteIconSize,
+                          icon: Icon(
+                              isFav ? Icons.favorite : Icons.favorite_border,
+                              color: isFav ? Colors.red : Colors.white),
+                          onPressed: () {
+                            ref
+                                .read(favoriteProvider.notifier)
+                                .toggleFavorite(product);
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -122,7 +130,8 @@ class ProductCard extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   product['category']?.toString() ?? '',
-                  style: TextStyle(fontSize: categoryFontSize, color: Colors.grey),
+                  style:
+                      TextStyle(fontSize: categoryFontSize, color: Colors.grey),
                 ),
                 Text(
                   product['name']?.toString() ?? '',

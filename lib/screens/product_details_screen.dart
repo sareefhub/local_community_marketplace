@@ -75,6 +75,8 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
     final favorites = ref.watch(favoriteProvider);
     final isFavorite = favorites.any((item) => item['id'] == product['id']);
 
+    final double favoriteIconSize = 25;
+
     return Scaffold(
       backgroundColor: const Color(0xFFE0F3F7),
       bottomNavigationBar: Padding(
@@ -125,12 +127,15 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
-
                   Positioned(
                     top: 16,
                     left: 8,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
+                      icon: Image.asset(
+                        'assets/icons/angle-small-left.png',
+                        width: 24,
+                        height: 24,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -139,17 +144,26 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                   Positioned(
                     top: 16,
                     right: 8,
-                    child: IconButton(
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : Colors.grey,
-                        size: 30,
+                    child: Container(
+                      width: favoriteIconSize + 8,
+                      height: favoriteIconSize + 8,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        shape: BoxShape.circle,
                       ),
-                      onPressed: () {
-                        ref
-                            .read(favoriteProvider.notifier)
-                            .toggleFavorite(product);
-                      },
+                      child: IconButton(
+                        padding: const EdgeInsets.all(4),
+                        iconSize: favoriteIconSize,
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                        ),
+                        onPressed: () {
+                          ref
+                              .read(favoriteProvider.notifier)
+                              .toggleFavorite(product);
+                        },
+                      ),
                     ),
                   ),
                 ],

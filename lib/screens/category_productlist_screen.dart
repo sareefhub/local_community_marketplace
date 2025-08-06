@@ -86,7 +86,11 @@ class _CategoryProductListScreenState
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Image.asset(
+                      'assets/icons/angle-small-left.png',
+                      width: 24,
+                      height: 24,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(

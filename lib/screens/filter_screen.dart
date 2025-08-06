@@ -1,7 +1,6 @@
-// filter_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:local_community_marketplace/components/filter_components.dart';
 
 class FilterScreen extends StatefulWidget {
   final String? initialCategory;
@@ -26,13 +25,12 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = widget.initialCategory; // กำหนดค่าเริ่มต้น
+    selectedCategory = widget.initialCategory;
     _loadFilterData();
   }
 
   Future<void> _loadFilterData() async {
     try {
-      // ดึงหมวดหมู่จาก collection 'categories'
       final categorySnapshot =
           await FirebaseFirestore.instance.collection('categories').get();
       final fetchedCategories = categorySnapshot.docs
@@ -40,13 +38,12 @@ class _FilterScreenState extends State<FilterScreen> {
           .where((label) => label.isNotEmpty)
           .toList();
 
-      // ดึงจังหวัดจาก collection 'products' และกรองเอา unique location เท่านั้น
       final productSnapshot =
           await FirebaseFirestore.instance.collection('products').get();
       final fetchedProvinces = productSnapshot.docs
           .map((doc) => doc.data()['location']?.toString() ?? '')
           .where((location) => location.isNotEmpty)
-          .toSet() // กรองซ้ำ
+          .toSet()
           .toList();
 
       setState(() {
@@ -91,20 +88,34 @@ class _FilterScreenState extends State<FilterScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('กรองข้อมูล')),
+      backgroundColor: const Color(0xFFE0F3F7),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE0F3F7),
+        centerTitle: true,
+        title: const Text(
+          'กรองข้อมูล',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        leading: IconButton(
+          icon: Image.asset(
+            'assets/icons/angle-small-left.png',
+            width: 24,
+            height: 24,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            DropdownButtonFormField<String>(
+            CustomDropdown(
               value: selectedCategory,
-              decoration: const InputDecoration(
-                labelText: 'หมวดหมู่',
-                border: OutlineInputBorder(),
-              ),
-              items: categories.map((cat) {
-                return DropdownMenuItem(value: cat, child: Text(cat));
-              }).toList(),
+              items: categories,
+              label: 'หมวดหมู่',
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
@@ -112,33 +123,15 @@ class _FilterScreenState extends State<FilterScreen> {
               },
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: minPriceController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'ราคาต่ำสุด',
-                border: OutlineInputBorder(),
-              ),
+            PriceRangeInput(
+              minPriceController: minPriceController,
+              maxPriceController: maxPriceController,
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: maxPriceController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'ราคาสูงสุด',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
+            CustomDropdown(
               value: selectedProvince,
-              decoration: const InputDecoration(
-                labelText: 'จังหวัด',
-                border: OutlineInputBorder(),
-              ),
-              items: provinces.map((prov) {
-                return DropdownMenuItem(value: prov, child: Text(prov));
-              }).toList(),
+              items: provinces,
+              label: 'จังหวัด',
               onChanged: (value) {
                 setState(() {
                   selectedProvince = value;
@@ -147,16 +140,41 @@ class _FilterScreenState extends State<FilterScreen> {
             ),
             const Spacer(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                OutlinedButton(
-                  onPressed: _clearFilters,
-                  child: const Text('ล้าง'),
+                Expanded(
+                  flex: 1,
+                  child: OutlinedButton(
+                    onPressed: _clearFilters,
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    child: const Text(
+                      'ล้าง',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: _applyFilters,
-                  child: const Text('ตกลง'),
-                )
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: _applyFilters,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF062252),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    child: const Text(
+                      'ตกลง',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],

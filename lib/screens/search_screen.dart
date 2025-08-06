@@ -58,30 +58,84 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE0F3F7),
       appBar: AppBar(
+        backgroundColor: const Color(0xFFE0F3F7),
+        elevation: 0,
         automaticallyImplyLeading: false,
-        title: null,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // back to home screen
-            },
-            child: const Text(
-              'ยกเลิก',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
+        titleSpacing: 0, // ชิดซ้าย
+        title: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Row(
+            children: [
+              // ปุ่มย้อนกลับ
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Image.asset(
+                  'assets/icons/angle-small-left.png',
+                  width: 24,
+                  height: 24,
+                ),
+              ),
+
+              // ช่องค้นหา (Expanded ให้กินพื้นที่ที่เหลือ)
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  decoration: InputDecoration(
+                    hintText: 'ค้นหาสินค้า',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // ปุ่ม Filter
+              GestureDetector(
+                onTap: _onFilterPressed,
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.filter_alt_outlined),
+                ),
+              ),
+              const SizedBox(width: 4),
+
+              // ปุ่ม Sort
+              GestureDetector(
+                onTap: _onSortPressed,
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.sort),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            SearchFilterSortBar(
-              searchController: _searchController,
-              onFilterPressed: _onFilterPressed,
-              onSortPressed: _onSortPressed,
-              onSearchChanged: _onSearchChanged,
-            ),
             const SizedBox(height: 16),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(

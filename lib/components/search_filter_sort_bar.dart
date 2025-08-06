@@ -25,8 +25,9 @@ class SearchFilterSortBar extends StatelessWidget {
           // ช่องค้นหา
           Expanded(
             child: TextField(
-              controller: searchController,
-              onChanged: onSearchChanged,
+              controller: searchController, // ควบคุมการแก้ไขข้อความในช่องค้นหา
+              onChanged:
+                  onSearchChanged, // เรียกฟังก์ชันทุกครั้งที่พิมพ์เปลี่ยนค่า
               decoration: InputDecoration(
                 hintText: 'ค้นหาสินค้า',
                 prefixIcon: const Icon(Icons.search),
