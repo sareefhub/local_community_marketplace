@@ -56,67 +56,100 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  Widget _buildPage(Map<String, String> item) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: 60),
+        Image.asset(item['image']!, height: 280),
+        const SizedBox(height: 36),
+        Text(
+          item['title']!,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF062252),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Text(
+            item['desc']!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF062252)),
+          ),
+        ),
+        const SizedBox(height: 24),
+        _buildDots(),
+        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ElevatedButton(
+            onPressed: _nextPage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC9E1E6),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  _currentIndex == pages.length - 1 ? 'Get Started' : 'Next',
+                  style: const TextStyle(
+                    color: Color(0xFF062252),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const Spacer(),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Image.asset(
+            'assets/logo.png',
+            height: 22,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDots() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        pages.length,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          height: 8,
+          width: _currentIndex == index ? 20 : 8,
+          decoration: BoxDecoration(
+            color: _currentIndex == index
+                ? const Color(0xFF062252)
+                : const Color(0xFFD0D5DD),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // 🔹 Background
-          Positioned.fill(
-            child: Image.asset(
-              'assets/onboarding/onboarding_bg.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          PageView.builder(
-            controller: _pageController,
-            itemCount: pages.length,
-            onPageChanged: (index) => setState(() => _currentIndex = index),
-            itemBuilder: (context, index) {
-              final item = pages[index];
-              return Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(item['image']!, height: 300),
-                    const SizedBox(height: 30),
-                    Text(item['title']!,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        )),
-                    const SizedBox(height: 16),
-                    Text(
-                      item['desc']!,
-                      textAlign: TextAlign.center,
-                      style:
-                          const TextStyle(fontSize: 16, color: Colors.black87),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          // 🔹 Next Button
-          Positioned(
-            bottom: 40,
-            left: 24,
-            right: 24,
-            child: ElevatedButton(
-              onPressed: _nextPage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE0F3F7),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: Text(
-                _currentIndex == pages.length - 1 ? 'Get Started' : 'Next',
-                style: const TextStyle(color: Colors.black),
-              ),
-            ),
-          )
-        ],
+      backgroundColor: const Color(0xFFE0F3F7),
+      body: PageView.builder(
+        controller: _pageController,
+        itemCount: pages.length,
+        onPageChanged: (index) => setState(() => _currentIndex = index),
+        itemBuilder: (context, index) => _buildPage(pages[index]),
       ),
     );
   }
