@@ -1,5 +1,6 @@
 // filter_components.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 class CustomDropdown extends StatelessWidget {
@@ -23,6 +24,7 @@ class CustomDropdown extends StatelessWidget {
       isExpanded: true,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: GoogleFonts.sarabun(fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -31,7 +33,10 @@ class CustomDropdown extends StatelessWidget {
       items: items
           .map((item) => DropdownMenuItem(
                 value: item,
-                child: Text(item),
+                child: Text(
+                  item,
+                  style: GoogleFonts.sarabun(fontSize: 14, color: Colors.black),
+                ),
               ))
           .toList(),
       onChanged: onChanged,
@@ -66,6 +71,7 @@ class PriceRangeInput extends StatelessWidget {
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               labelText: 'ราคาต่ำสุด',
+              labelStyle: GoogleFonts.sarabun(fontSize: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -85,6 +91,7 @@ class PriceRangeInput extends StatelessWidget {
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               labelText: 'ราคาสูงสุด',
+              labelStyle: GoogleFonts.sarabun(fontSize: 14),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

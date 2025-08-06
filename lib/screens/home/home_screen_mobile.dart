@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/components/category_list.dart';
@@ -78,6 +79,9 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
                 child: AbsorbPointer(
                   // ป้องกัน TextField ถูกแก้ไข
                   child: TextField(
+                    style: GoogleFonts.sarabun(
+                      fontSize: 14,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'ค้นหา',
                       prefixIcon: const Icon(Icons.search),

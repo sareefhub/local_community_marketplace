@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_community_marketplace/components/filter_components.dart';
 
@@ -92,11 +93,11 @@ class _FilterScreenState extends State<FilterScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE0F3F7),
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'กรองข้อมูล',
-          style: TextStyle(
+          style: GoogleFonts.sarabun(
             fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(
@@ -151,9 +152,9 @@ class _FilterScreenState extends State<FilterScreen> {
                       ),
                       minimumSize: const Size.fromHeight(48),
                     ),
-                    child: const Text(
+                    child: Text(
                       'ล้าง',
-                      style: TextStyle(color: Colors.black),
+                      style: GoogleFonts.sarabun(color: Colors.black),
                     ),
                   ),
                 ),
@@ -169,9 +170,9 @@ class _FilterScreenState extends State<FilterScreen> {
                       ),
                       minimumSize: const Size.fromHeight(48),
                     ),
-                    child: const Text(
+                    child: Text(
                       'ตกลง',
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.sarabun(color: Colors.white),
                     ),
                   ),
                 ),

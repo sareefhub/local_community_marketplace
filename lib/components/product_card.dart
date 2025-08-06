@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_community_marketplace/screens/product_details_screen.dart';
 import 'package:local_community_marketplace/providers/favorite_provider.dart';
@@ -26,17 +27,17 @@ class ProductCard extends ConsumerWidget {
 
         // กำหนดขนาดตามความกว้างของ container
         final cardWidth = constraints.maxWidth;
-        final imageHeight = cardWidth * 0.75;
+        final imageHeight = cardWidth * 0.9;
 
         // ปรับขนาดฟอนต์และไอคอนให้เหมาะสม (มีขอบเขต min-max)
         double clampFontSize(double size, double min, double max) =>
             size.clamp(min, max);
 
         final categoryFontSize = clampFontSize(cardWidth * 0.04, 10, 14);
-        final nameFontSize = clampFontSize(cardWidth * 0.045, 12, 18);
+        final nameFontSize = clampFontSize(cardWidth * 0.05, 13, 18);
         final locationFontSize = clampFontSize(cardWidth * 0.035, 10, 14);
         final starSize = clampFontSize(cardWidth * 0.045, 12, 18);
-        final priceFontSize = clampFontSize(cardWidth * 0.045, 12, 18);
+        final priceFontSize = clampFontSize(cardWidth * 0.055, 16, 20);
         final favoriteIconSize = clampFontSize(cardWidth * 0.07, 20, 30);
 
         Widget buildImage() {
@@ -87,12 +88,15 @@ class ProductCard extends ConsumerWidget {
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(8),
+            height: 200,
+            padding:
+                const EdgeInsets.only(top: 2, left: 8, right: 8, bottom: 2),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Stack(
@@ -130,21 +134,24 @@ class ProductCard extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   product['category']?.toString() ?? '',
-                  style:
-                      TextStyle(fontSize: categoryFontSize, color: Colors.grey),
-                ),
-                Text(
-                  product['name']?.toString() ?? '',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: nameFontSize,
-                  ),
-                ),
-                Text(
-                  product['location']?.toString() ?? '',
-                  style: TextStyle(fontSize: locationFontSize),
+                  style: GoogleFonts.sarabun(
+                      fontSize: categoryFontSize, color: Colors.grey),
                 ),
                 const SizedBox(height: 4),
+                Text(
+                  product['name']?.toString() ?? '',
+                  style: GoogleFonts.sarabun(
+                      fontWeight: FontWeight.bold,
+                      fontSize: nameFontSize,
+                      color: Colors.black),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  product['location']?.toString() ?? '',
+                  style: GoogleFonts.sarabun(
+                      fontSize: locationFontSize, color: Colors.grey),
+                ),
+                const SizedBox(height: 6),
                 Row(
                   children: List.generate(5, (i) {
                     return Icon(
@@ -157,7 +164,7 @@ class ProductCard extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   product['price']?.toString() ?? '',
-                  style: TextStyle(
+                  style: GoogleFonts.sarabun(
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
                     fontSize: priceFontSize,

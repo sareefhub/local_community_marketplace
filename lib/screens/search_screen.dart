@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
-import 'package:local_community_marketplace/components/search_filter_sort_bar.dart';
 import 'package:local_community_marketplace/screens/filter_screen.dart';
+import 'package:local_community_marketplace/components/search_bar_all.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -63,74 +63,12 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: const Color(0xFFE0F3F7),
         elevation: 0,
         automaticallyImplyLeading: false,
-        titleSpacing: 0, // ชิดซ้าย
-        title: Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: Row(
-            children: [
-              // ปุ่มย้อนกลับ
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Image.asset(
-                  'assets/icons/angle-small-left.png',
-                  width: 24,
-                  height: 24,
-                ),
-              ),
-
-              // ช่องค้นหา (Expanded ให้กินพื้นที่ที่เหลือ)
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  decoration: InputDecoration(
-                    hintText: 'ค้นหาสินค้า',
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 8),
-
-              // ปุ่ม Filter
-              GestureDetector(
-                onTap: _onFilterPressed,
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.filter_alt_outlined),
-                ),
-              ),
-              const SizedBox(width: 4),
-
-              // ปุ่ม Sort
-              GestureDetector(
-                onTap: _onSortPressed,
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.sort),
-                ),
-              ),
-            ],
-          ),
+        titleSpacing: 0,
+        title: SearchBarAll(
+          searchController: _searchController,
+          onSearchChanged: _onSearchChanged,
+          onFilterPressed: _onFilterPressed,
+          onSortPressed: _onSortPressed,
         ),
       ),
       body: SafeArea(

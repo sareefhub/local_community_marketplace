@@ -1,6 +1,7 @@
 // lib/components/category_list.dart
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/screens/category_productlist_screen.dart';
 
 class CategoryList extends StatelessWidget {
@@ -14,14 +15,15 @@ class CategoryList extends StatelessWidget {
       children: [
         // Category Title
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 26),
+          padding: const EdgeInsets.only(left: 14),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
               'หมวดหมู่',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+              style: GoogleFonts.sarabun(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                color: Colors.black,
               ),
             ),
           ),
@@ -80,7 +82,10 @@ class CategoryList extends StatelessWidget {
                             width: 60,
                             child: Text(
                               category['label']!,
-                              style: const TextStyle(fontSize: 12),
+                              style: GoogleFonts.sarabun(
+                                fontSize: 11,
+                                color: Colors.black,
+                              ),
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,

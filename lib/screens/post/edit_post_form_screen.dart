@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart'; // เพิ่ม import
 import '../../widgets/post_category_selector.dart';
 import '../../widgets/post_province_selector.dart';
 
@@ -16,7 +17,11 @@ class EditPostFormScreen extends StatefulWidget {
 class _EditPostFormScreenState extends State<EditPostFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  String _productName = '', _price = '', _productDetail = '', _phone = '', _imageUrl = '';
+  String _productName = '',
+      _price = '',
+      _productDetail = '',
+      _phone = '',
+      _imageUrl = '';
   String? _category, _province;
 
   bool _isLoading = true;
@@ -33,7 +38,7 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
       final doc = await _firestore.collection('posts').doc(widget.postId).get();
       if (doc.exists) {
         final data = doc.data()!;
-        if (!mounted) return;  // เช็ค mounted ก่อน setState
+        if (!mounted) return;
         setState(() {
           _productName = data['name'] ?? '';
           _price = data['price'] ?? '';
@@ -47,7 +52,11 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error loading post: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error loading post: $e', style: GoogleFonts.sarabun()),
+        ),
+      );
     }
   }
 
@@ -66,9 +75,8 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
       setState(() {
-        _imageUrl = picked.path; // แสดง path ชั่วคราวก่อน upload
+        _imageUrl = picked.path;
       });
-
       // TODO: Upload image to Firebase Storage และอัพเดต _imageUrl เป็น URL จริง
     }
   }
@@ -92,16 +100,29 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
         updatedData['state'] = newState;
       }
 
-      await _firestore.collection('posts').doc(widget.postId).update(updatedData);
+      await _firestore
+          .collection('posts')
+          .doc(widget.postId)
+          .update(updatedData);
 
-      if (!mounted) return; // เช็ค mounted ก่อนใช้ context
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(newState == 'post' ? 'Post published successfully' : 'Product updated successfully')),
+        SnackBar(
+          content: Text(
+            newState == 'post'
+                ? 'Post published successfully'
+                : 'Product updated successfully',
+            style: GoogleFonts.sarabun(),
+          ),
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
-      if (!mounted) return; // เช็ค mounted ก่อนใช้ context
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Update failed: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Update failed: $e', style: GoogleFonts.sarabun())),
+      );
     }
   }
 
@@ -116,13 +137,15 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE0F3F7),
         leading: const BackButton(color: Colors.black),
-        title: const Text('Edit Post', style: TextStyle(color: Colors.black)),
+        title:
+            Text('Edit Post', style: GoogleFonts.sarabun(color: Colors.black)),
         centerTitle: true,
         elevation: 0,
         actions: [
           TextButton(
             onPressed: () => _updateProduct(),
-            child: const Text('Save', style: TextStyle(color: Colors.black)),
+            child:
+                Text('Save', style: GoogleFonts.sarabun(color: Colors.black)),
           ),
         ],
       ),
@@ -133,7 +156,8 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
             children: [
               _buildSectionHeader('Product information'),
               _buildTextField('Product name', 'xxxxx',
-                  initialValue: _productName, onSaved: (val) => _productName = val ?? ''),
+                  initialValue: _productName,
+                  onSaved: (val) => _productName = val ?? ''),
               _buildSelectField('Category', _category, _selectCategory),
               _buildTextField('Price', 'Bath',
                   keyboardType: TextInputType.number,
@@ -155,7 +179,8 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
                   onSaved: (val) => _phone = val ?? ''),
               const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -163,12 +188,14 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFE0F3F7),
                       foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Post',
-                      style: TextStyle(fontSize: 16, color: Colors.black),
+                      style: GoogleFonts.sarabun(
+                          fontSize: 16, color: Colors.black),
                     ),
                   ),
                 ),
@@ -196,7 +223,8 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
               : null,
         ),
         child: _imageUrl.isEmpty
-            ? const Center(child: Icon(Icons.camera_alt, color: Colors.grey, size: 40))
+            ? Center(
+                child: Icon(Icons.camera_alt, color: Colors.grey, size: 40))
             : null,
       ),
     );
@@ -208,9 +236,9 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
         color: const Color(0xFFF0F0F0),
         child: Text(
           title,
-          style: const TextStyle(
+          style: GoogleFonts.sarabun(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF062252),
+            color: const Color(0xFF062252),
           ),
         ),
       );
@@ -233,9 +261,16 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
-          crossAxisAlignment: maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+          crossAxisAlignment: maxLines > 1
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 14))),
+            Expanded(
+                flex: 3,
+                child: Text(
+                  label,
+                  style: GoogleFonts.sarabun(fontSize: 14),
+                )),
             Expanded(
               flex: 5,
               child: TextFormField(
@@ -244,6 +279,7 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
                 keyboardType: keyboardType,
                 decoration: InputDecoration(
                   hintText: hint,
+                  hintStyle: GoogleFonts.sarabun(),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -251,13 +287,15 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
                 textAlign: TextAlign.right,
                 validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
                 onSaved: onSaved,
+                style: GoogleFonts.sarabun(),
               ),
             ),
           ],
         ),
       );
 
-  Widget _buildSelectField(String label, String? value, VoidCallback onTap) => InkWell(
+  Widget _buildSelectField(String label, String? value, VoidCallback onTap) =>
+      InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -267,15 +305,25 @@ class _EditPostFormScreenState extends State<EditPostFormScreen> {
           ),
           child: Row(
             children: [
-              Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 14))),
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    label,
+                    style: GoogleFonts.sarabun(fontSize: 14),
+                  )),
               Expanded(
                 flex: 5,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(value ?? 'Select', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text(
+                      value ?? 'Select',
+                      style:
+                          GoogleFonts.sarabun(fontSize: 14, color: Colors.grey),
+                    ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                    const Icon(Icons.chevron_right,
+                        size: 18, color: Colors.grey),
                   ],
                 ),
               ),

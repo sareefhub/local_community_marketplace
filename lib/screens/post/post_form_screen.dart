@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart'; // เพิ่ม import
 import '../../models/product_model.dart';
 import '../../widgets/post_category_selector.dart';
 import '../../widgets/post_province_selector.dart';
@@ -29,7 +30,6 @@ class _PostFormScreenState extends State<PostFormScreen> {
     if (selected != null) setState(() => _province = selected);
   }
 
-  // แก้ไขเพิ่ม parameter state เพื่อกำหนดสถานะตอนบันทึก
   Future<void> _saveProduct({String state = 'draft'}) async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
@@ -39,8 +39,10 @@ class _PostFormScreenState extends State<PostFormScreen> {
       final counterSnapshot = await counterRef.get();
 
       int lastPostId = 0;
-      if (counterSnapshot.exists && counterSnapshot.data()?['lastPostId'] != null) {
-        lastPostId = int.tryParse(counterSnapshot.data()!['lastPostId'].toString()) ?? 0;
+      if (counterSnapshot.exists &&
+          counterSnapshot.data()?['lastPostId'] != null) {
+        lastPostId =
+            int.tryParse(counterSnapshot.data()!['lastPostId'].toString()) ?? 0;
       }
 
       final newPostId = lastPostId + 1;
@@ -65,15 +67,25 @@ class _PostFormScreenState extends State<PostFormScreen> {
       await postRef.set(product.toMap());
       await counterRef.set({'lastPostId': newPostId});
 
-      if (!mounted) return;  // ตรวจสอบก่อนใช้ context
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state == 'post' ? 'Product posted successfully' : 'Product saved successfully')),
+        SnackBar(
+          content: Text(
+            state == 'post'
+                ? 'Product posted successfully'
+                : 'Product saved successfully',
+            style: GoogleFonts.sarabun(),
+          ),
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
-      if (!mounted) return;  // ตรวจสอบก่อนใช้ context
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save product: $e')),
+        SnackBar(
+          content:
+              Text('Failed to save product: $e', style: GoogleFonts.sarabun()),
+        ),
       );
     }
   }
@@ -85,15 +97,17 @@ class _PostFormScreenState extends State<PostFormScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFE0F3F7),
         leading: const BackButton(color: Colors.black),
-        title: const Text('Post', style: TextStyle(color: Colors.black)),
+        title: Text('Post', style: GoogleFonts.sarabun(color: Colors.black)),
         centerTitle: true,
         elevation: 0,
         actions: [
           TextButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) _saveProduct(state: 'draft');
+              if (_formKey.currentState!.validate())
+                _saveProduct(state: 'draft');
             },
-            child: const Text('Save', style: TextStyle(color: Colors.black)),
+            child:
+                Text('Save', style: GoogleFonts.sarabun(color: Colors.black)),
           ),
         ],
       ),
@@ -103,23 +117,28 @@ class _PostFormScreenState extends State<PostFormScreen> {
           child: Column(
             children: [
               _buildSectionHeader('Product information'),
-              _buildTextField('Product name', 'xxxxx', onSaved: (val) => _productName = val ?? ''),
+              _buildTextField('Product name', 'xxxxx',
+                  onSaved: (val) => _productName = val ?? ''),
               _buildSelectField('Category', _category, _selectCategory),
               _buildTextField('Price', 'Bath',
-                  keyboardType: TextInputType.number, onSaved: (val) => _price = val ?? ''),
+                  keyboardType: TextInputType.number,
+                  onSaved: (val) => _price = val ?? ''),
               _buildTextField('Product Detail', 'Detail',
-                  maxLines: 6, underlineThickness: 1.5, onSaved: (val) => _productDetail = val ?? ''),
+                  maxLines: 6,
+                  underlineThickness: 1.5,
+                  onSaved: (val) => _productDetail = val ?? ''),
               _buildSectionHeader('Location'),
               _buildSelectField('Province', _province, _selectProvince),
               _buildSectionHeader('Contact'),
               _buildTextField('Phone', 'xxxxxxxxxx',
-                  keyboardType: TextInputType.phone, onSaved: (val) => _phone = val ?? ''),
+                  keyboardType: TextInputType.phone,
+                  onSaved: (val) => _phone = val ?? ''),
               const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
                   'Complete all fields to speed up your sale.\nBy tapping "Post" you agree to the listing terms.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  style: GoogleFonts.sarabun(fontSize: 12, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -127,16 +146,19 @@ class _PostFormScreenState extends State<PostFormScreen> {
               Center(
                 child: OutlinedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) _saveProduct(state: 'post');
+                    if (_formKey.currentState!.validate())
+                      _saveProduct(state: 'post');
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: const Color(0xFFE0F3F7),
                     foregroundColor: Colors.black,
                     side: const BorderSide(color: Color(0xFF062252)),
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Post'),
+                  child: Text('Post', style: GoogleFonts.sarabun()),
                 ),
               ),
               const SizedBox(height: 24),
@@ -153,9 +175,9 @@ class _PostFormScreenState extends State<PostFormScreen> {
         color: const Color(0xFFF0F0F0),
         child: Text(
           title,
-          style: const TextStyle(
+          style: GoogleFonts.sarabun(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF062252),
+            color: const Color(0xFF062252),
           ),
         ),
       );
@@ -178,9 +200,13 @@ class _PostFormScreenState extends State<PostFormScreen> {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
-          crossAxisAlignment: maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+          crossAxisAlignment: maxLines > 1
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           children: [
-            Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 14))),
+            Expanded(
+                flex: 3,
+                child: Text(label, style: GoogleFonts.sarabun(fontSize: 14))),
             Expanded(
               flex: 5,
               child: TextFormField(
@@ -189,6 +215,7 @@ class _PostFormScreenState extends State<PostFormScreen> {
                 keyboardType: keyboardType,
                 decoration: InputDecoration(
                   hintText: hint,
+                  hintStyle: GoogleFonts.sarabun(),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -196,6 +223,7 @@ class _PostFormScreenState extends State<PostFormScreen> {
                 textAlign: TextAlign.right,
                 validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
                 onSaved: onSaved,
+                style: GoogleFonts.sarabun(),
               ),
             ),
           ],
@@ -213,15 +241,20 @@ class _PostFormScreenState extends State<PostFormScreen> {
           ),
           child: Row(
             children: [
-              Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 14))),
+              Expanded(
+                  flex: 3,
+                  child: Text(label, style: GoogleFonts.sarabun(fontSize: 14))),
               Expanded(
                 flex: 5,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(value ?? 'Select', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text(value ?? 'Select',
+                        style: GoogleFonts.sarabun(
+                            fontSize: 14, color: Colors.grey)),
                     const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                    const Icon(Icons.chevron_right,
+                        size: 18, color: Colors.grey),
                   ],
                 ),
               ),

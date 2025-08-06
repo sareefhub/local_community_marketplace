@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/providers/favorite_provider.dart';
-import 'package:local_community_marketplace/components/search_filter_sort_bar.dart';
+import 'package:local_community_marketplace/components/search_bar_category.dart';
 import 'package:local_community_marketplace/screens/filter_screen.dart';
 
 class CategoryProductListScreen extends ConsumerStatefulWidget {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
@@ -25,12 +26,22 @@ class _PostScreenState extends State<PostScreen> {
       await _firestore.collection('posts').doc(postId).delete();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Post deleted successfully')),
+        SnackBar(
+          content: Text(
+            'Post deleted successfully',
+            style: GoogleFonts.sarabun(),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete post: $e')),
+        SnackBar(
+          content: Text(
+            'Failed to delete post: $e',
+            style: GoogleFonts.sarabun(),
+          ),
+        ),
       );
     }
   }
@@ -39,11 +50,29 @@ class _PostScreenState extends State<PostScreen> {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: const Text('Are you sure you want to delete this post?'),
+        title: Text(
+          'Confirm Delete',
+          style: GoogleFonts.sarabun(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this post?',
+          style: GoogleFonts.sarabun(),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Delete')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.sarabun(),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Delete',
+              style: GoogleFonts.sarabun(color: Colors.red),
+            ),
+          ),
         ],
       ),
     );
@@ -54,7 +83,11 @@ class _PostScreenState extends State<PostScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFE0F3F7),
-        title: const Text('Post', style: TextStyle(color: Colors.black)),
+        title: Text(
+          'โพสต์',
+          style: GoogleFonts.sarabun(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
@@ -73,11 +106,20 @@ class _PostScreenState extends State<PostScreen> {
           stream: _firestore.collection('posts').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blue,
+                ),
+              );
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('No posts found.'));
+              return Center(
+                child: Text(
+                  'No posts found.',
+                  style: GoogleFonts.sarabun(),
+                ),
+              );
             }
 
             final posts = snapshot.data!.docs;
@@ -98,7 +140,8 @@ class _PostScreenState extends State<PostScreen> {
                   onTap: () {
                     GoRouter.of(context).push('/postedit/$postId');
                   },
-                  child: _buildPostItem(context, name, description, status, postId),
+                  child: _buildPostItem(
+                      context, name, description, status, postId),
                 );
               },
             );
@@ -109,7 +152,8 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 
-  Widget _buildPostItem(BuildContext context, String name, String description, String status, String postId) {
+  Widget _buildPostItem(BuildContext context, String name, String description,
+      String status, String postId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
@@ -117,11 +161,11 @@ class _PostScreenState extends State<PostScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFFE6E6E6),
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 4,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -143,13 +187,22 @@ class _PostScreenState extends State<PostScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    name,
+                    style: GoogleFonts.sarabun(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   Text(
                     description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13, color: Colors.black87),
+                    style: GoogleFonts.sarabun(
+                      fontSize: 13,
+                      color: Colors.black87,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Align(
@@ -202,7 +255,10 @@ class _PostScreenState extends State<PostScreen> {
       ),
       child: Text(
         status,
-        style: const TextStyle(fontSize: 12, color: Colors.black),
+        style: GoogleFonts.sarabun(
+          fontSize: 12,
+          color: Colors.black,
+        ),
       ),
     );
   }
