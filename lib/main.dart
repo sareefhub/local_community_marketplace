@@ -19,6 +19,7 @@ import 'screens/post/post_form_screen.dart';
 import 'screens/favorite_screen.dart';
 import 'screens/post/choose_photo_screen.dart';
 import 'screens/post/edit_post_form_screen.dart';
+import 'screens/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +85,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/choose_photo',
           builder: (context, state) => const ChoosePhotoScreen(),
+        ),
+        GoRoute(
+          path: '/chat',
+          builder: (context, state) => const ChatScreen(),
         ),
         GoRoute(
           path: '/postedit/:id',

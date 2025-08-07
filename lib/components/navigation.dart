@@ -20,7 +20,7 @@ class BottomNavBar extends StatelessWidget {
         context.go('/post');
         break;
       case 3:
-        //context.go('/chat');
+        context.go('/chat');
         break;
       case 4:
         context.go('/profile');
