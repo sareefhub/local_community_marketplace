@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_community_marketplace/screens/product_details_screen.dart';
 import 'package:local_community_marketplace/providers/favorite_provider.dart';
+import 'package:local_community_marketplace/utils/user_session.dart';
 
 class ProductCard extends ConsumerWidget {
   final Map<String, dynamic> product;
@@ -122,6 +124,12 @@ class ProductCard extends ConsumerWidget {
                               isFav ? Icons.favorite : Icons.favorite_border,
                               color: isFav ? Colors.red : Colors.white),
                           onPressed: () {
+                            final userId = UserSession.userId;
+
+                            if (userId == null) {
+                              GoRouter.of(context).push('/login');
+                              return;
+                            }
                             ref
                                 .read(favoriteProvider.notifier)
                                 .toggleFavorite(product);

@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/providers/favorite_provider.dart';
+import 'package:local_community_marketplace/utils/user_session.dart';
 
 class ProductDetailsPage extends ConsumerStatefulWidget {
   // ConsumerStatefulWidget
@@ -159,6 +161,15 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                           color: isFavorite ? Colors.red : Colors.white,
                         ),
                         onPressed: () {
+                          final userId = UserSession.userId;
+
+                          if (userId == null) {
+                            // ยังไม่ล็อกอิน → ไปหน้า Login
+                            GoRouter.of(context).push('/login');
+                            return;
+                          }
+
+                          // ล็อกอินแล้ว → toggle favorite
                           ref
                               .read(favoriteProvider.notifier)
                               .toggleFavorite(product);
