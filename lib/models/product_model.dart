@@ -10,7 +10,7 @@ class ProductModel {
   final String sellerName;
   final String sellerImage;
   final String phone;
-  final String state; // ✅ เพิ่ม state
+  final String state;
 
   ProductModel({
     required this.id,
@@ -24,7 +24,7 @@ class ProductModel {
     required this.sellerName,
     required this.sellerImage,
     required this.phone,
-    required this.state, // ✅ เพิ่มใน constructor
+    required this.state,
   });
 
   factory ProductModel.fromMap(Map<String, dynamic> data, String docId) {
@@ -44,7 +44,7 @@ class ProductModel {
       sellerName: data['sellerName'] ?? '',
       sellerImage: data['sellerImage'] ?? '',
       phone: data['phone'] ?? '',
-      state: data['state'] ?? 'draft', // ✅ เพิ่มจาก map โดยกำหนด default เป็น draft
+      state: data['state'] ?? 'draft',
     );
   }
 
@@ -61,7 +61,7 @@ class ProductModel {
       'sellerName': sellerName,
       'sellerImage': sellerImage,
       'phone': phone,
-      'state': state, // ✅ เพิ่มใน map
+      'state': state,
     };
   }
 }
