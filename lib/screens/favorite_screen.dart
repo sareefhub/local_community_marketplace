@@ -26,7 +26,11 @@ class FavoriteScreen extends ConsumerWidget {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Image.asset(
+            'assets/icons/angle-small-left.png',
+            width: 24,
+            height: 24,
+          ),
           onPressed: () => context.go('/profile'),
         ),
       ),

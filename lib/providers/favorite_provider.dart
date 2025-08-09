@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_community_marketplace/repositories/favorite_repository.dart';
+import 'package:local_community_marketplace/repositories/local_storage_repository.dart';
 import 'package:local_community_marketplace/utils/user_session.dart';
 
 final favoriteProvider =
@@ -10,30 +11,35 @@ final favoriteProvider =
 class FavoriteNotifier extends StateNotifier<List<Map<String, dynamic>>> {
   final Ref ref;
   final FavoriteRepository repo = FavoriteRepository();
+  final LocalStorageRepository localRepo = LocalStorageRepository();
 
   FavoriteNotifier(this.ref) : super([]) {
     loadFavorites();
   }
 
   Future<void> loadFavorites() async {
-    final userId = UserSession.userId;
-    print('Loading favorites for userId: $userId');
-    if (userId == null) {
-      state = [];
-      return;
+    print('--- Loading favorites ---');
+    final localItems = await localRepo.loadFavorites();
+    if (localItems.isNotEmpty) {
+      print('Using local favorites first (${localItems.length} items)');
+      state = localItems;
     }
-    final items = await repo.fetchFavorites(userId);
-    print('Loaded favorites count: ${items.length}');
-    state = items;
+
+    final userId = UserSession.userId;
+    print('Loading cloud favorites for userId: $userId');
+    if (userId != null) {
+      final cloudItems = await repo.fetchFavorites(userId);
+      print('Cloud favorites loaded: ${cloudItems.length} items');
+      state = cloudItems;
+      await localRepo.saveFavorites(state);
+    }
   }
 
   Future<void> toggleFavorite(Map<String, dynamic> product) async {
     final userId = UserSession.userId;
-    print('Toggle favorite for userId: $userId, productId: ${product['id']}');
-    if (userId == null) return;
+    print('Toggle favorite: ${product['id']} for userId: $userId');
 
     final exists = state.any((item) => item['id'] == product['id']);
-
     if (exists) {
       state = state.where((item) => item['id'] != product['id']).toList();
     } else {
@@ -52,11 +58,21 @@ class FavoriteNotifier extends StateNotifier<List<Map<String, dynamic>>> {
       state = [...state, normalizedProduct];
     }
 
-    await repo.saveFavorites(userId, state);
-    print('Favorites saved. Current count: ${state.length}');
+    await localRepo.saveFavorites(state);
+
+    if (userId != null) {
+      await repo.saveFavorites(userId, state);
+      print('Saved to cloud as well.');
+    }
+    print('Current favorites count: ${state.length}');
   }
 
-  void clearFavorites() {
+  Future<void> clearFavorites() async {
     state = [];
+    await localRepo.clearFavorites();
+    final userId = UserSession.userId;
+    if (userId != null) {
+      await repo.saveFavorites(userId, state);
+    }
   }
 }
