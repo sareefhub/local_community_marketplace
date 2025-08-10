@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:intl/date_symbol_data_local.dart'; // สำหรับการโหลด locale ภาษาไทย
 import 'firebase_options.dart';
 
 import 'screens/splash_screen.dart';
@@ -24,9 +24,14 @@ import 'screens/notification/notification_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase init
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // โหลด locale ภาษาไทย (หรือจะใส่ null เพื่อโหลดทุกภาษา)
+  await initializeDateFormatting('th', null);
 
   runApp(const ProviderScope(child: MyApp()));
 }
