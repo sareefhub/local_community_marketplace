@@ -87,7 +87,13 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  if (UserSession.userId == null) {
+                    GoRouter.of(context).push('/login');
+                    return;
+                  }
+                  // โค้ดทำงานตอนล็อกอินแล้ว เช่น เปิดหน้าสนทนา
+                },
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: const Text("Chat"),
               ),
@@ -95,7 +101,13 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
             const SizedBox(width: 8),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  if (UserSession.userId == null) {
+                    GoRouter.of(context).push('/login');
+                    return;
+                  }
+                  // โค้ดทำงานตอนล็อกอินแล้ว เช่น โทรหาผู้ขาย
+                },
                 icon: const Icon(Icons.call_outlined),
                 label: const Text("Call"),
               ),
@@ -236,13 +248,23 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                               Row(
                                 children: [
                                   OutlinedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (UserSession.userId == null) {
+                                        GoRouter.of(context).push('/login');
+                                        return;
+                                      }
+                                    },
                                     icon: const Icon(Icons.chat),
                                     label: const Text("Chat"),
                                   ),
                                   const SizedBox(width: 8),
                                   OutlinedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      if (UserSession.userId == null) {
+                                        GoRouter.of(context).push('/login');
+                                        return;
+                                      }
+                                    },
                                     icon: const Icon(Icons.call),
                                     label: const Text("Call"),
                                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:local_community_marketplace/utils/user_session.dart'; // import UserSession
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -8,6 +9,14 @@ class BottomNavBar extends StatelessWidget {
 
   void _onItemTapped(BuildContext context, int index) {
     if (index == currentIndex) return;
+
+    final bool loggedIn = UserSession.userId != null;
+
+    if (!loggedIn && index != 0) {
+      // ถ้ายังไม่ล็อกอิน และกดปุ่มที่ไม่ใช่หน้าแรก ให้ไปหน้า login แทน
+      GoRouter.of(context).push('/login');
+      return;
+    }
 
     switch (index) {
       case 0:
