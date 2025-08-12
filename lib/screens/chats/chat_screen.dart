@@ -5,8 +5,18 @@ import 'package:intl/intl.dart';
 import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:go_router/go_router.dart';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  final String currentUserId;
+
+  const ChatScreen({super.key, required this.currentUserId});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String searchText = '';
 
   String formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return '';
@@ -17,18 +27,13 @@ class ChatScreen extends StatelessWidget {
     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (messageDate == today) {
-      // วันนี้
       return DateFormat('HH.mm').format(dateTime);
     } else if (messageDate == yesterday) {
-      // เมื่อวาน
-      return DateFormat('d MMM', 'th').format(dateTime); // เช่น 6 ส.ค.
+      return DateFormat('d/MM').format(dateTime);
     } else if (dateTime.year < now.year) {
-      // ปีก่อนหน้า
-      return DateFormat('d MMM yyyy', 'th')
-          .format(dateTime); // เช่น 6 ส.ค. 2023
+      return DateFormat('d/MM/yyyy').format(dateTime);
     } else {
-      // ภายในปีนี้แต่ไม่ใช่เมื่อวาน/วันนี้
-      return DateFormat('d MMM', 'th').format(dateTime); // เช่น 6 ส.ค.
+      return DateFormat('d/MM').format(dateTime);
     }
   }
 
@@ -52,112 +57,263 @@ class ChatScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('chats')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text(
-                'ยังไม่มีข้อความ',
-                style: GoogleFonts.sarabun(fontSize: 16, color: Colors.grey),
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(50),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-            );
-          }
-
-          final chatDocs = snapshot.data!.docs;
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: chatDocs.length,
-            itemBuilder: (context, index) {
-              final data = chatDocs[index].data() as Map<String, dynamic>;
-              final userName = data['userName'] ?? 'ไม่ทราบชื่อ';
-              final lastMessage = data['lastMessage'] ?? '';
-              final avatarUrl = data['avatarUrl'] as String?;
-              final timestamp = data['timestamp'] as Timestamp?;
-              final timeLabel = formatTimestamp(timestamp);
-
-              return GestureDetector(
-                onTap: () {
-                  final router = GoRouter.of(context);
-                  router.push(
-                    '/chat_detail?chatId=${chatDocs[index].id}'
-                    '&userName=${Uri.encodeComponent(userName)}'
-                    '&avatarUrl=${avatarUrl != null ? Uri.encodeComponent(avatarUrl) : ''}',
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.grey,
-                        backgroundImage:
-                            avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                        child: avatarUrl == null
-                            ? const Icon(Icons.person, color: Colors.white)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    userName,
-                                    style: GoogleFonts.sarabun(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  timeLabel,
-                                  style: GoogleFonts.sarabun(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              lastMessage,
-                              style: GoogleFonts.sarabun(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  hintStyle: GoogleFonts.sarabun(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-              );
-            },
-          );
-        },
+                onChanged: (val) {
+                  setState(() {
+                    searchText = val.trim().toLowerCase();
+                  });
+                },
+              ),
+            ),
+          ),
+
+          // Chat List
+          Expanded(
+            child:
+                searchText.isEmpty ? _buildChatList() : _buildSearchResults(),
+          ),
+        ],
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 3),
+    );
+  }
+
+  Widget _buildChatList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('chats')
+          .where('users', arrayContains: widget.currentUserId)
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final chats = snapshot.data!.docs;
+        if (chats.isEmpty) {
+          return Center(
+            child: Text(
+              'ยังไม่มีข้อความ',
+              style: GoogleFonts.sarabun(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(12.0),
+          itemCount: chats.length,
+          itemBuilder: (context, index) {
+            final chat = chats[index];
+            final data = chat.data() as Map<String, dynamic>;
+            final users = List<String>.from(data['users']);
+            final otherUserId =
+                users.firstWhere((u) => u != widget.currentUserId);
+            final lastMessage = data['lastMessage'] ?? '';
+            final timestamp = data['timestamp'] as Timestamp?;
+            final timeLabel = formatTimestamp(timestamp);
+
+            return StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(otherUserId)
+                  .snapshots(),
+              builder: (context, userSnapshot) {
+                String userName = otherUserId;
+                String? avatarUrl;
+
+                if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                  final userDoc = userSnapshot.data!;
+                  userName = userDoc['username'] ?? otherUserId;
+                  avatarUrl = userDoc['avatarUrl'] as String?;
+                }
+
+                return GestureDetector(
+                  onTap: () {
+                    context.push(
+                      '/chat_detail/${chat.id}/${widget.currentUserId}/$otherUserId',
+                      extra: {
+                        'userName': userName,
+                        'avatarUrl': avatarUrl,
+                      },
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Colors.grey.shade400,
+                          backgroundImage: avatarUrl != null
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          child: avatarUrl == null
+                              ? const Icon(Icons.person, color: Colors.white)
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      userName,
+                                      style: GoogleFonts.sarabun(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    timeLabel,
+                                    style: GoogleFonts.sarabun(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                lastMessage,
+                                style: GoogleFonts.sarabun(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isGreaterThanOrEqualTo: searchText)
+          .where('username', isLessThanOrEqualTo: searchText + '\uf8ff')
+          .get(),
+      builder: (context, userSnapshot) {
+        if (!userSnapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final usersFound = userSnapshot.data!.docs;
+
+        if (usersFound.isEmpty) {
+          return Center(
+            child: Text(
+              'ไม่พบผู้ใช้',
+              style: GoogleFonts.sarabun(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        }
+
+        return FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('chats')
+              .where('users', arrayContains: widget.currentUserId)
+              .get(),
+          builder: (context, chatSnapshot) {
+            if (!chatSnapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final chats = chatSnapshot.data!.docs;
+
+            Map<String, QueryDocumentSnapshot> chatMap = {};
+            for (var chat in chats) {
+              final data = chat.data() as Map<String, dynamic>;
+              final users = List<String>.from(data['users']);
+              final otherUserId =
+                  users.firstWhere((u) => u != widget.currentUserId);
+              chatMap[otherUserId] = chat;
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: usersFound.length,
+              itemBuilder: (context, index) {
+                final userDoc = usersFound[index];
+                final userId = userDoc.id;
+                final userName = userDoc['username'] ?? userId;
+
+                final existingChat = chatMap[userId];
+
+                return ListTile(
+                  title: Text(
+                    userName,
+                    style: GoogleFonts.sarabun(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: existingChat != null
+                      ? Text('แชทที่มีอยู่',
+                          style: GoogleFonts.sarabun(color: Colors.grey))
+                      : Text('เริ่มแชทใหม่',
+                          style: GoogleFonts.sarabun(color: Colors.grey)),
+                  onTap: () async {
+                    if (existingChat != null) {
+                      context.push(
+                        '/chat_detail/${existingChat.id}/${widget.currentUserId}/$userId',
+                      );
+                    } else {
+                      final newChatDoc =
+                          FirebaseFirestore.instance.collection('chats').doc();
+                      await newChatDoc.set({
+                        'users': [widget.currentUserId, userId],
+                        'createdAt': FieldValue.serverTimestamp(),
+                        'timestamp': FieldValue.serverTimestamp(),
+                      });
+                      context.push(
+                        '/chat_detail/${newChatDoc.id}/${widget.currentUserId}/$userId',
+                      );
+                    }
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

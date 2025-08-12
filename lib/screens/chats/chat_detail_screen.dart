@@ -6,13 +6,15 @@ import 'package:go_router/go_router.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final String chatId;
-  final String userName;
+  final String currentUserId;
+  final String otherUserId;
   final String? avatarUrl;
 
   const ChatDetailScreen({
     super.key,
     required this.chatId,
-    required this.userName,
+    required this.currentUserId,
+    required this.otherUserId,
     this.avatarUrl,
   });
 
@@ -24,12 +26,32 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  String? otherUsername;
+
   @override
   void initState() {
     super.initState();
+    _fetchOtherUsername();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
+  }
+
+  Future<void> _fetchOtherUsername() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.otherUserId)
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        otherUsername = doc.data()?['username'] ?? widget.otherUserId;
+      });
+    } else {
+      setState(() {
+        otherUsername = widget.otherUserId;
+      });
+    }
   }
 
   void _scrollToBottom() {
@@ -49,7 +71,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         .add({
       'text': message,
       'timestamp': FieldValue.serverTimestamp(),
-      'senderName': 'You', // TODO: ใช้ชื่อผู้ใช้จริง
+      'senderId': widget.currentUserId,
+      'receiverId': widget.otherUserId,
     });
 
     await FirebaseFirestore.instance
@@ -99,7 +122,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              widget.userName,
+              otherUsername ?? 'Loading...',
               style: GoogleFonts.sarabun(fontWeight: FontWeight.bold),
             ),
           ],
@@ -153,10 +176,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     final msgData =
                         messages[index].data() as Map<String, dynamic>;
                     final text = msgData['text'] ?? '';
-                    final senderName = msgData['senderName'] ?? '';
+                    final senderId = msgData['senderId'] ?? '';
                     final timestamp = msgData['timestamp'] as Timestamp?;
                     final dateTime = timestamp?.toDate();
-                    final isMe = senderName == 'You';
+                    final isMe = senderId == widget.currentUserId;
 
                     Widget messageBubble() {
                       return Container(
@@ -196,7 +219,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       );
                     }
 
-                    // แสดงวันที่แยกกลางเมื่อวันที่เปลี่ยน
                     Widget dateHeader() {
                       if (dateTime == null) return const SizedBox.shrink();
                       if (lastDate == null ||
@@ -226,10 +248,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                     return Column(
                       children: [
-                        // แสดง header วันที่เมื่อวันเปลี่ยน
                         if (index == 0) dateHeader() else Container(),
                         if (index > 0) dateHeader(),
-
                         Align(
                           alignment: isMe
                               ? Alignment.centerRight

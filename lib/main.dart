@@ -22,6 +22,7 @@ import 'screens/post/edit_post_form_screen.dart';
 import 'screens/chats/chat_screen.dart';
 import 'screens/notification/notification_screen.dart';
 import 'screens/chats/chat_detail_screen.dart';
+import 'utils/user_session.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,20 +96,23 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/chat',
-          builder: (context, state) => const ChatScreen(),
+          builder: (context, state) {
+            // ดึง currentUserId จาก UserSession
+            final userId = UserSession.userId ?? '';
+            return ChatScreen(currentUserId: userId);
+          },
         ),
         GoRoute(
-          path: '/chat_detail',
+          path: '/chat_detail/:chatId/:currentUserId/:otherUserId',
           builder: (context, state) {
-            final chatId = state.uri.queryParameters['chatId'] ?? '';
-            final userName =
-                state.uri.queryParameters['userName'] ?? 'ไม่ทราบชื่อ';
-            final avatarUrl = state.uri.queryParameters['avatarUrl'];
-
+            // ดึงค่า path parameters
+            final chatId = state.pathParameters['chatId']!;
+            final currentUserId = state.pathParameters['currentUserId']!;
+            final otherUserId = state.pathParameters['otherUserId']!;
             return ChatDetailScreen(
               chatId: chatId,
-              userName: userName,
-              avatarUrl: avatarUrl != '' ? avatarUrl : null,
+              currentUserId: currentUserId,
+              otherUserId: otherUserId,
             );
           },
         ),
