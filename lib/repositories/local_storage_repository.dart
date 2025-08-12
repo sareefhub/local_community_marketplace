@@ -31,32 +31,3 @@ class LocalStorageRepository {
     print('[LocalStorage] Cleared local favorites.');
   }
 }
-
-class LocalProductCacheRepository {
-  static const _productsKey = 'cachedProducts';
-
-  Future<void> saveProducts(List<Map<String, dynamic>> products) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = products.map((p) => jsonEncode(p)).toList();
-    await prefs.setStringList(_productsKey, jsonList);
-    print('[LocalStorage] Cached ${products.length} products locally.');
-  }
-
-  Future<List<Map<String, dynamic>>> loadProducts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = prefs.getStringList(_productsKey);
-    if (jsonList == null) {
-      print('[LocalStorage] No cached products found.');
-      return [];
-    }
-    return jsonList
-        .map((item) => jsonDecode(item) as Map<String, dynamic>)
-        .toList();
-  }
-
-  Future<void> clearProducts() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_productsKey);
-    print('[LocalStorage] Cleared cached products.');
-  }
-}
