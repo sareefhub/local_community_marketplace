@@ -7,6 +7,7 @@ import 'package:local_community_marketplace/components/navigation.dart';
 import 'package:local_community_marketplace/components/product_card.dart';
 import 'package:local_community_marketplace/components/category_list.dart';
 import 'package:local_community_marketplace/screens/search_screen.dart';
+import 'package:local_community_marketplace/repositories/local_storage_repository.dart';
 
 class HomeScreenMobile extends StatefulWidget {
   const HomeScreenMobile({super.key});
@@ -16,27 +17,46 @@ class HomeScreenMobile extends StatefulWidget {
 }
 
 class _HomeScreenMobileState extends State<HomeScreenMobile> {
+  final localProductRepo = LocalProductCacheRepository();
+
   Future<List<Map<String, dynamic>>> fetchProducts() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('products').get();
+    // โหลดจาก cache ก่อน
+    final localProducts = await localProductRepo.loadProducts();
+    if (localProducts.isNotEmpty) {
+      print('Showing cached products first (${localProducts.length} items)');
+    }
 
-    return snapshot.docs.map((doc) {
-      final data = Map<String, dynamic>.from(doc.data());
-      data['id'] = doc.id;
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('products').get();
 
-      data['category'] = data['category'] ?? 'ไม่มีหมวดหมู่';
-      data['name'] = data['name'] ?? 'ไม่มีชื่อสินค้า';
-      data['location'] = data['location'] ?? 'ไม่มีสถานที่';
-      data['price'] = data['price'] ?? 'ราคาไม่ระบุ';
-      data['rating'] = (data['rating'] is num) ? data['rating'] : 0;
-      data['image'] = data['image'] ?? 'assets/images/placeholder.png';
-      data['description'] = data['description'] ?? '';
-      data['sellerName'] = data['sellerName'] ?? '';
-      data['sellerImage'] =
-          data['sellerImage'] ?? 'assets/images/placeholder_seller.png';
+      final cloudProducts = snapshot.docs.map((doc) {
+        final data = Map<String, dynamic>.from(doc.data());
+        data['id'] = doc.id;
 
-      return data;
-    }).toList();
+        data['category'] = data['category'] ?? 'ไม่มีหมวดหมู่';
+        data['name'] = data['name'] ?? 'ไม่มีชื่อสินค้า';
+        data['location'] = data['location'] ?? 'ไม่มีสถานที่';
+        data['price'] = data['price'] ?? 'ราคาไม่ระบุ';
+        data['rating'] = (data['rating'] is num) ? data['rating'] : 0;
+        data['image'] = data['image'] ?? 'assets/images/placeholder.png';
+        data['description'] = data['description'] ?? '';
+        data['sellerName'] = data['sellerName'] ?? '';
+        data['sellerImage'] =
+            data['sellerImage'] ?? 'assets/images/placeholder_seller.png';
+
+        return data;
+      }).toList();
+
+      // อัปเดต cache
+      await localProductRepo.saveProducts(cloudProducts);
+
+      return cloudProducts;
+    } catch (e) {
+      print('Error fetching from Firestore: $e');
+      print('Loading products from cache due to error.');
+      return localProducts;
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {
@@ -100,7 +120,7 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
 
             const SizedBox(height: 16),
 
-            // Load data from Firestore
+            // Load data from Firestore & cache
             Expanded(
               child: FutureBuilder(
                 future: Future.wait([

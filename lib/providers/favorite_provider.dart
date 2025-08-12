@@ -19,6 +19,7 @@ class FavoriteNotifier extends StateNotifier<List<Map<String, dynamic>>> {
 
   Future<void> loadFavorites() async {
     print('--- Loading favorites ---');
+
     final localItems = await localRepo.loadFavorites();
     if (localItems.isNotEmpty) {
       print('Using local favorites first (${localItems.length} items)');
@@ -26,13 +27,18 @@ class FavoriteNotifier extends StateNotifier<List<Map<String, dynamic>>> {
     }
 
     final userId = UserSession.userId;
-    print('Loading cloud favorites for userId: $userId');
-    if (userId != null) {
-      final cloudItems = await repo.fetchFavorites(userId);
-      print('Cloud favorites loaded: ${cloudItems.length} items');
-      state = cloudItems;
-      await localRepo.saveFavorites(state);
+
+    if (userId == null || userId.isEmpty) {
+      print(
+          'UserSession.userId is null or empty. Skip loading cloud favorites.');
+      return; // ข้ามโหลด cloud favorites
     }
+
+    print('Loading cloud favorites for userId: $userId');
+    final cloudItems = await repo.fetchFavorites(userId);
+    print('Cloud favorites loaded: ${cloudItems.length} items');
+    state = cloudItems;
+    await localRepo.saveFavorites(state);
   }
 
   Future<void> toggleFavorite(Map<String, dynamic> product) async {
