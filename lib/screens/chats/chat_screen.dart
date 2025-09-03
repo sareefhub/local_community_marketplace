@@ -102,7 +102,6 @@ class _ChatScreenState extends State<ChatScreen> {
       stream: FirebaseFirestore.instance
           .collection('chats')
           .where('users', arrayContains: widget.currentUserId)
-          .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -110,6 +109,7 @@ class _ChatScreenState extends State<ChatScreen> {
         }
 
         final chats = snapshot.data!.docs;
+
         if (chats.isEmpty) {
           return Center(
             child: Text(
@@ -119,17 +119,33 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
 
+        // ✅ sort client-side ตาม timestamp ล่าสุด
+        chats.sort((a, b) {
+          final t1 =
+              (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+          final t2 =
+              (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+          return (t2?.toDate() ?? DateTime(0))
+              .compareTo(t1?.toDate() ?? DateTime(0));
+        });
+
         return ListView.builder(
           padding: const EdgeInsets.all(12.0),
           itemCount: chats.length,
           itemBuilder: (context, index) {
             final chat = chats[index];
             final data = chat.data() as Map<String, dynamic>;
-            final users = List<String>.from(data['users']);
-            final otherUserId =
-                users.firstWhere((u) => u != widget.currentUserId);
-            final lastMessage = data['lastMessage'] ?? '';
-            final timestamp = data['timestamp'] as Timestamp?;
+
+            final users = List<String>.from(data['users'] ?? []);
+            final otherUserId = users
+                .firstWhere((u) => u != widget.currentUserId, orElse: () => '');
+
+            final lastMessage = data.containsKey('lastMessage')
+                ? data['lastMessage'] ?? ''
+                : '';
+            final timestamp = data.containsKey('timestamp')
+                ? data['timestamp'] as Timestamp?
+                : null;
             final timeLabel = formatTimestamp(timestamp);
 
             return StreamBuilder<DocumentSnapshot>(
@@ -143,8 +159,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 if (userSnapshot.hasData && userSnapshot.data!.exists) {
                   final userDoc = userSnapshot.data!;
-                  userName = userDoc['username'] ?? otherUserId;
-                  avatarUrl = userDoc['avatarUrl'] as String?;
+                  final userData = userDoc.data() as Map<String, dynamic>?;
+
+                  if (userData != null) {
+                    userName = userData.containsKey('username')
+                        ? userData['username'] ?? otherUserId
+                        : otherUserId;
+                    avatarUrl = userData.containsKey('avatarUrl')
+                        ? userData['avatarUrl'] as String?
+                        : null;
+                  }
                 }
 
                 return GestureDetector(
@@ -169,10 +193,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         CircleAvatar(
                           radius: 24,
                           backgroundColor: Colors.grey.shade400,
-                          backgroundImage: avatarUrl != null
-                              ? NetworkImage(avatarUrl)
-                              : null,
-                          child: avatarUrl == null
+                          backgroundImage:
+                              (avatarUrl != null && avatarUrl.isNotEmpty)
+                                  ? NetworkImage(avatarUrl)
+                                  : null,
+                          child: (avatarUrl == null || avatarUrl.isEmpty)
                               ? const Icon(Icons.person, color: Colors.white)
                               : null,
                         ),
@@ -230,15 +255,19 @@ class _ChatScreenState extends State<ChatScreen> {
     return FutureBuilder<QuerySnapshot>(
       future: FirebaseFirestore.instance
           .collection('users')
-          .where('username', isGreaterThanOrEqualTo: searchText)
-          .where('username', isLessThanOrEqualTo: searchText + '\uf8ff')
-          .get(),
+          .get(), // ✅ ดึง users ทั้งหมดมาก่อน
       builder: (context, userSnapshot) {
         if (!userSnapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final usersFound = userSnapshot.data!.docs;
+        // ✅ filter เอา currentUser ออก + ค้นหาตามชื่อ
+        final usersFound = userSnapshot.data!.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final username = (data['username'] ?? '').toString().toLowerCase();
+          return doc.id != widget.currentUserId &&
+              (searchText.isEmpty || username.contains(searchText));
+        }).toList();
 
         if (usersFound.isEmpty) {
           return Center(
@@ -261,6 +290,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
             final chats = chatSnapshot.data!.docs;
 
+            // ✅ map หา chat เดิมถ้ามี
             Map<String, QueryDocumentSnapshot> chatMap = {};
             for (var chat in chats) {
               final data = chat.data() as Map<String, dynamic>;
@@ -276,11 +306,25 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final userDoc = usersFound[index];
                 final userId = userDoc.id;
-                final userName = userDoc['username'] ?? userId;
+                final userData = userDoc.data() as Map<String, dynamic>;
+                final userName = userData['username'] ?? userId;
+                final avatarUrl = userData.containsKey('avatarUrl')
+                    ? userData['avatarUrl'] as String?
+                    : null;
 
                 final existingChat = chatMap[userId];
 
                 return ListTile(
+                  leading: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.grey.shade400,
+                    backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+                        ? NetworkImage(avatarUrl)
+                        : null,
+                    child: (avatarUrl == null || avatarUrl.isEmpty)
+                        ? const Icon(Icons.person, color: Colors.white)
+                        : null,
+                  ),
                   title: Text(
                     userName,
                     style: GoogleFonts.sarabun(fontWeight: FontWeight.w600),
@@ -294,6 +338,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (existingChat != null) {
                       context.push(
                         '/chat_detail/${existingChat.id}/${widget.currentUserId}/$userId',
+                        extra: {
+                          'userName': userName,
+                          'avatarUrl': avatarUrl,
+                        },
                       );
                     } else {
                       final newChatDoc =
@@ -305,6 +353,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       });
                       context.push(
                         '/chat_detail/${newChatDoc.id}/${widget.currentUserId}/$userId',
+                        extra: {
+                          'userName': userName,
+                          'avatarUrl': avatarUrl,
+                        },
                       );
                     }
                   },
